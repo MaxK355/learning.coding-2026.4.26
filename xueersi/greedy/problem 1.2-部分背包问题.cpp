@@ -1,4 +1,6 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <cstdio>
 using namespace std;
 struct node{
     double m, v, dv;
