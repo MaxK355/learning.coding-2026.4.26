@@ -1,0 +1,685 @@
+
+
+Skip to content
+Using Gmail with screen readers
+1 of 1,015
+(no subject)
+Inbox
+
+Max Kongmethionylthreonylthreonylglutami
+11:40 AM (2 hours ago)
+I want to build a short video to demonstrate this usaco problem https://usaco.org/index.php?page=viewproblem2&cpid=1588 Step1: we need some way to tell what thi
+
+Yunjie Zhang
+Attachments
+1:40 PM (4 minutes ago)
+On Sat, Oct 24, 2026 at 11:41 AM Max Kongmethionylthreonylthreonylglutami <m355113k@gmail.com> wrote: I want to build a short video to demonstrate this usaco pr
+
+Yunjie Zhang
+Attachments
+1:44 PM (1 minute ago)
+to me
+
+ One attachment
+  •  Scanned by Gmail
+index.html
+100%
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>USACO 1588 – Visual Walkthrough</title>
+<style>
+  :root{
+    --bg:#0f172a; --panel:#1e293b; --panel2:#273449; --text:#e2e8f0; --muted:#94a3b8;
+    --acc:#38bdf8; --odd:#f59e0b; --even:#22c55e; --red:#f87171; --pur:#a78bfa;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
+    font-family:"Segoe UI",system-ui,sans-serif;font-size:20px}
+  header{display:flex;align-items:center;gap:16px;padding:12px 28px;background:#0b1222;border-bottom:1px solid #334155}
+  header h1{font-size:20px;margin:0;font-weight:600;color:var(--acc)}
+  .tabs{display:flex;gap:8px;margin-left:auto}
+  .tab{padding:6px 14px;border-radius:8px;background:var(--panel);color:var(--muted);cursor:pointer;font-size:16px;border:1px solid transparent}
+  .tab.on{color:var(--text);border-color:var(--acc)}
+  main{height:calc(100% - 110px);overflow:auto}
+  .slide{display:none;max-width:1200px;margin:0 auto;padding:28px 36px;animation:fade .4s}
+  .slide.on{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1}}
+  h2{font-size:36px;margin:0 0 6px}
+  h2 small{font-size:18px;color:var(--muted);font-weight:400;margin-left:10px}
+  h3{color:var(--acc);margin:18px 0 8px}
+  p,li{line-height:1.5}
+  .muted{color:var(--muted)}
+  .row{display:flex;gap:20px;flex-wrap:wrap}
+  .card{background:var(--panel);border-radius:14px;padding:18px 22px;flex:1;min-width:300px}
+  .card.hl{border:2px solid var(--acc)}
+  .mono,code{font-family:Consolas,"Cascadia Code",monospace}
+  .big{font-size:30px}
+  .digits{display:inline-flex;gap:4px;font-family:Consolas,monospace;font-size:30px}
+  .d{width:38px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:var(--panel2);transition:all .35s}
+  .d.o{background:var(--odd);color:#111}
+  .d.e{background:var(--even);color:#111}
+  .d.n{background:#475569}
+  .d.nine{background:var(--red);color:#111}
+  .d.dim{opacity:.35}
+  .arrow{font-size:28px;color:var(--muted);margin:0 10px}
+  button{background:var(--acc);color:#0b1222;border:none;border-radius:8px;padding:8px 16px;font-size:17px;font-weight:600;cursor:pointer;margin:4px 4px 4px 0}
+  button.sec{background:var(--panel2);color:var(--text)}
+  input[type=text]{background:#0b1222;color:var(--text);border:1px solid #475569;border-radius:8px;padding:8px 12px;font-size:20px;font-family:Consolas,monospace;width:340px}
+  table{border-collapse:collapse;font-size:18px}
+  td,th{padding:6px 12px;border-bottom:1px solid #334155;text-align:left}
+  th{color:var(--muted);font-weight:500}
+  .badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:14px;font-weight:600}
+  .b-par{background:var(--pur);color:#111}
+  .b-min{background:var(--acc);color:#111}
+  .b-1{background:var(--odd);color:#111}
+  .b-2{background:var(--even);color:#111}
+  .trace{max-height:380px;overflow:auto}
+  .formula{font-size:34px;text-align:center;padding:18px;background:var(--panel);border-radius:14px;margin:16px 0}
+  .formula b{color:var(--acc)}
+  .blocks{display:flex;flex-wrap:wrap;gap:6px;align-items:flex-end;margin-top:12px}
+  .blk{display:flex;flex-direction:column;align-items:center;font-size:14px;color:var(--muted)}
+  .blk .cells{display:flex;gap:2px}
+  .cell{width:22px;height:22px;border-radius:4px}
+  .cell.o{background:var(--odd)} .cell.e{background:var(--even)}
+  pre.code{background:#0b1222;border-radius:12px;padding:18px 22px;font-size:16px;line-height:1.45;overflow:auto;margin:0}
+  .kw{color:#c084fc}.ty{color:#38bdf8}.cm{color:#64748b;font-style:italic}.nu{color:#fbbf24}.st{color:#86efac}
+  .hlLine{background:#1e3a5f;display:inline-block;width:100%}
+  footer{height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;background:#0b1222;border-top:1px solid #334155;font-size:15px;color:var(--muted)}
+  .dots span{display:inline-block;width:10px;height:10px;border-radius:50%;background:#334155;margin:0 3px;cursor:pointer}
+  .dots span.on{background:var(--acc)}
+  .step-note{min-height:32px;font-size:20px;margin:10px 0;color:var(--odd)}
+  .center{text-align:center}
+  #caption{position:fixed;left:50%;bottom:66px;transform:translateX(-50%);max-width:1300px;width:max-content;
+    background:rgba(2,6,23,.88);border:1px solid #334155;border-radius:12px;padding:12px 24px;font-size:24px;
+    line-height:1.4;text-align:center;opacity:0;transition:opacity .4s;pointer-events:none;z-index:10}
+  #caption.on{opacity:1}
+  body.autoplay{cursor:none}
+  body.autoplay #caption{bottom:62px}
+</style>
+</head>
+<body>
+<header>
+  <h1>USACO · Problem 1588 · “Turn x into 0”</h1>
+  <div class="tabs">
+    <div class="tab" data-go="1">① The Problem</div>
+    <div class="tab" data-go="4">② The Insight</div>
+    <div class="tab" data-go="9">③ The Code</div>
+  </div>
+</header>
+<main>
+
+<!-- 0 TITLE -->
+<section class="slide center">
+  <h2 style="font-size:52px;margin-top:80px">How many steps to reach 0?</h2>
+  <p class="muted big">USACO problem 1588 · a visual walkthrough</p>
+  <div style="margin-top:50px" class="digits" id="titleDigits"></div>
+  <p class="muted" style="margin-top:60px">Use ← / → (or the dots below) to move between slides</p>
+</section>
+
+<!-- 1 THE RULE -->
+<section class="slide">
+  <h2>Step 1 · What is f(x)? <small>two rules</small></h2>
+  <div class="row">
+    <div class="card">
+      <h3>Rule A: “parity squash”</h3>
+      <p>If x has <b>any digit other than 0 or 1</b>, replace every digit:</p>
+      <p><span class="badge b-1">odd → 1</span> &nbsp; <span class="badge b-2">even → 0</span></p>
+      <div id="ruleA" style="margin-top:14px"></div>
+      <button class="sec" onclick="animRuleA()">▶ replay</button>
+    </div>
+    <div class="card">
+      <h3>Rule B: “minus one”</h3>
+      <p>If x is made <b>only of 0s and 1s</b>, return <b>x − 1</b> (normal decimal subtraction).</p>
+      <div id="ruleB" style="margin-top:14px"></div>
+      <button class="sec" onclick="animRuleB()">▶ replay</button>
+    </div>
+  </div>
+  <div class="card hl" style="margin-top:20px">
+    <b>Question:</b> starting from x, how many times must we apply f until x becomes <b>0</b>?
+    Output the answer mod 10<sup>9</sup>+7.
+    <span class="muted">(x can have up to 200 000 digits!)</span>
+  </div>
+</section>
+
+<!-- 2 SIMULATOR -->
+<section class="slide">
+  <h2>Try it yourself <small>simulate f step by step</small></h2>
+  <div>
+    <input type="text" id="simIn" value="210">
+    <button onclick="simReset()">Load</button>
+    <button class="sec" onclick="simStep()">Step ▸</button>
+    <button class="sec" onclick="simRun()">Run all ▸▸</button>
+    <span class="muted" style="margin-left:10px">Samples:</span>
+    <button class="sec" onclick="simLoad('24680')">24680</button>
+    <button class="sec" onclick="simLoad('210')">210</button>
+    <button class="sec" onclick="simLoad('1010')">1010</button>
+    <button class="sec" onclick="simLoad('2024')">2024</button>
+  </div>
+  <div class="row" style="margin-top:14px">
+    <div class="card" style="flex:2">
+      <div class="digits" id="simCur"></div>
+      <div class="step-note" id="simNote"></div>
+      <div class="trace"><table id="simTable"><tr><th>#</th><th>rule</th><th>value</th></tr></table></div>
+    </div>
+    <div class="card" style="flex:1">
+      <h3>Steps so far</h3>
+      <div class="big mono" id="simCount" style="font-size:64px">0</div>
+      <p class="muted">Sample check:<br>24680 → 1 step<br>210 → 4 steps<br>(210 → 10 → 9 → 1 → 0)</p>
+    </div>
+  </div>
+</section>
+
+<!-- 3 WHY BRUTE FORCE FAILS -->
+<section class="slide">
+  <h2>Why not just simulate?</h2>
+  <p>Let's count how many steps some inputs need:</p>
+  <table id="growTable" style="font-size:20px"></table>
+  <div class="card hl" style="margin-top:20px">
+    The number of steps grows like <b>2<sup>(number of digits)</sup></b>.
+    With 200 000 digits that is astronomically large — we need a <b>formula</b>, not a simulation.
+  </div>
+</section>
+
+<!-- 4 INSIGHT 1 -->
+<section class="slide">
+  <h2>Step 2 · Insight ①: we live in a 0/1 world</h2>
+  <p>Rule A is used <b>at most once at the start</b> to turn x into a 0/1 number. After that, look at what “−1” does to a 0/1 number. There are only two cases:</p>
+  <div class="row">
+    <div class="card">
+      <h3>Case 1: ends in <span style="color:var(--odd)">1</span></h3>
+      <div id="case1"></div>
+      <p><span class="badge b-1">1 step</span> — still only 0/1 digits.</p>
+    </div>
+    <div class="card">
+      <h3>Case 2: ends in <span style="color:var(--even)">1 0…0</span></h3>
+      <div id="case2"></div>
+      <p><span class="badge b-2">2 steps</span> — the borrow creates 9s, then Rule A turns the 9s into 1s.</p>
+    </div>
+  </div>
+  <button class="sec" onclick="animCases()">▶ replay animation</button>
+  <div class="card hl" style="margin-top:14px">
+    Either way, we're back to a number with only 0s and 1s. 
+    <b>Hmm… 1011 → 1010 → 1001 → 1000 → 0111 … that looks like counting down in binary!</b>
+  </div>
+</section>
+
+<!-- 5 INSIGHT 2 binary countdown -->
+<section class="slide">
+  <h2>Insight ②: it's a binary countdown</h2>
+  <p>Read the 0/1 string as a <b>binary number b</b>. Every “round” lowers b by exactly 1.</p>
+  <div>
+    <input type="text" id="bcIn" value="1100" style="width:200px">
+    <button onclick="bcReset()">Load</button>
+    <button class="sec" onclick="bcStep()">Next round ▸</button>
+    <button class="sec" onclick="bcRunAll()">Run all ▸▸</button>
+  </div>
+  <div class="row" style="margin-top:14px">
+    <div class="card" style="flex:2">
+      <div class="trace" style="max-height:420px"><table id="bcTable"></table></div>
+    </div>
+    <div class="card" style="flex:1">
+      <h3>Total steps</h3>
+      <div class="mono" id="bcTotal" style="font-size:60px">0</div>
+      <p class="muted">odd b → <span class="badge b-1">1 step</span><br>even b → <span class="badge b-2">2 steps</span></p>
+    </div>
+  </div>
+</section>
+
+<!-- 6 INSIGHT 3 counting -->
+<section class="slide">
+  <h2>Insight ③: just count the cost</h2>
+  <p>We visit b, b−1, …, 2, 1. Odd values cost 1 step, even values cost 2 steps.</p>
+  <div>b = <input type="range" id="bSlider" min="1" max="40" value="12" style="width:400px;vertical-align:middle">
+    <span class="mono big" id="bVal">12</span></div>
+  <div class="blocks" id="blocks"></div>
+  <div class="formula" id="countFormula"></div>
+  <div class="card hl">
+    Every value 1…b costs at least 1 → <b>b</b>. The even ones (there are ⌊b/2⌋ of them) cost 1 extra → <b>⌊b/2⌋</b>.
+  </div>
+</section>
+
+<!-- 7 FINAL FORMULA -->
+<section class="slide">
+  <h2>Putting it together</h2>
+  <div class="formula">answer = <b>[x has a digit ≥ 2]</b> + <b>b</b> + <b>⌊b / 2⌋</b></div>
+  <p>where b = the 0/1 string (after the parity squash, if needed) read in <b>binary</b>.</p>
+  <div>
+    <input type="text" id="ffIn" value="210"> <button onclick="ffRun()">Compute</button>
+  </div>
+  <div class="card" style="margin-top:14px" id="ffOut"></div>
+</section>
+
+<!-- 8 BIG NUMBERS -->
+<section class="slide">
+  <h2>Handling 200 000 digits <small>mod 10⁹+7</small></h2>
+  <div class="row">
+    <div class="card">
+      <h3>b mod p — Horner's rule</h3>
+      <p class="mono">b = (b·2 + bit) mod p</p>
+      <h3>⌊b/2⌋ — drop the last bit!</h3>
+      <p>Shifting right by 1 in binary = removing the last character. So run the same loop but skip the last digit.</p>
+    </div>
+    <div class="card">
+      <input type="text" id="hoIn" value="3141592" style="width:220px">
+      <button onclick="hoReset()">Load</button>
+      <button class="sec" onclick="hoStep()">Next digit ▸</button>
+      <div class="digits" id="hoDigits" style="margin-top:12px"></div>
+      <table id="hoTable" style="margin-top:10px"></table>
+    </div>
+  </div>
+</section>
+
+<!-- 9 CODE -->
+<section class="slide">
+  <h2>Step 3 · The C++ solution <small>O(total digits)</small></h2>
+  <div class="row">
+    <div style="flex:3;min-width:600px"><pre class="code" id="codeBox"></pre></div>
+    <div class="card" style="flex:1">
+      <h3>Walk through</h3>
+      <button class="sec" onclick="hlCode('check')">1 · detect digit ≥ 2</button><br>
+      <button class="sec" onclick="hlCode('parity')">2 · parity squash (+1)</button><br>
+      <button class="sec" onclick="hlCode('loop')">3 · b and ⌊b/2⌋ mod p</button><br>
+      <button class="sec" onclick="hlCode('ans')">4 · answer</button><br>
+      <button class="sec" onclick="hlCode('')">clear</button>
+      <p class="muted" style="font-size:16px">Time: O(digits) · Memory: O(digits)</p>
+    </div>
+  </div>
+</section>
+
+<!-- 10 SUMMARY -->
+<section class="slide">
+  <h2>Summary</h2>
+  <div class="row">
+    <div class="card"><h3>① Simplify</h3>After at most one parity step, x only contains 0s and 1s — forever.</div>
+    <div class="card"><h3>② Re-interpret</h3>A 0/1 decimal string behaves like a <b>binary counter</b> going down by 1 each round.</div>
+    <div class="card"><h3>③ Count</h3>Odd → 1 step, even → 2 steps.<br>Total = b + ⌊b/2⌋ (+1 if squashed).</div>
+  </div>
+  <div class="formula" style="margin-top:24px">answer = <b>[digit ≥ 2]</b> + <b>b</b> + <b>⌊b/2⌋</b> &nbsp;(mod 10⁹+7)</div>
+</section>
+
+</main>
+<div id="caption"></div>
+<footer>
+  <span id="slideLabel"></span>
+  <span class="dots" id="dots"></span>
+  <span>← → to navigate · P = autoplay</span>
+</footer>
+
+<script>
+const MOD = 1000000007n;
+const sleep = ms => window.__dry ? Promise.resolve() : new Promise(r => setTimeout(r, ms));
+if (new URLSearchParams(location.search).get('dry')) window.__dry = true;
+const has2plus = s => /[2-9]/.test(s);
+const squash = s => s.replace(/./g, c => (+c % 2) ? '1' : '0');
+const strip0 = s => s.replace(/^0+(?=.)/, '');
+function f(s){ return has2plus(s) ? {v: strip0(squash(s)), r:'A'} : {v: (BigInt(s)-1n).toString(), r:'B'}; }
+
+function digitsHTML(s, cls){
+  return '<div class="digits">' + [...s].map((c,i)=>`<div class="d ${cls?cls(c,i):''}">${c}</div>`).join('') + '</div>';
+}
+
+/* ---------- slide navigation ---------- */
+const slides = [...document.querySelectorAll('.slide')];
+const names = ['Title','Step 1 · Rules','Step 1 · Simulator','Step 1 · Why it\'s hard','Step 2 · 0/1 world','Step 2 · Binary countdown','Step 2 · Counting','Step 2 · Formula','Step 2 · Big numbers','Step 3 · Code','Summary'];
+let cur = 0;
+const dots = document.getElementById('dots');
+slides.forEach((_,i)=>{ const d=document.createElement('span'); d.onclick=()=>go(i); dots.appendChild(d); });
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>go(+t.dataset.go));
+function go(i){
+  cur = Math.max(0, Math.min(slides.length-1, i));
+  slides.forEach((s,k)=>s.classList.toggle('on', k===cur));
+  [...dots.children].forEach((d,k)=>d.classList.toggle('on', k===cur));
+  document.querySelectorAll('.tab').forEach(t=>{
+    const g=+t.dataset.go; t.classList.toggle('on', (g===1&&cur>=1&&cur<4)||(g===4&&cur>=4&&cur<9)||(g===9&&cur>=9));
+  });
+  document.getElementById('slideLabel').textContent = `${cur+1}/${slides.length} · ${names[cur]}`;
+  onEnter[cur] && onEnter[cur]();
+}
+document.addEventListener('keydown', e=>{
+  if (e.target.tagName==='INPUT' && e.target.type==='text') return;
+  if (e.key==='ArrowRight' || e.key==='PageDown') go(cur+1);
+  if (e.key==='ArrowLeft' || e.key==='PageUp') go(cur-1);
+});
+
+/* ---------- title ---------- */
+async function animTitle(){
+  const el = document.getElementById('titleDigits');
+  let s = '210';
+  el.innerHTML = digitsHTML(s);
+  for (let k=0;k<4;k++){ await sleep(900); if(cur!==0) return; s=f(s).v; el.innerHTML = digitsHTML(s); }
+}
+
+/* ---------- rule A / B ---------- */
+async function animRuleA(){
+  const el = document.getElementById('ruleA'), s='24135';
+  el.innerHTML = digitsHTML(s);
+  await sleep(700);
+  el.innerHTML = digitsHTML(s, c=> +c%2?'o':'e');
+  await sleep(900);
+  el.innerHTML = digitsHTML(s, c=> +c%2?'o':'e') + '<div class="arrow">↓</div>' + digitsHTML(squash(s), c=> c==='1'?'o':'e')
+     + '<p class="muted">24135 → 00101 = 101</p>';
+}
+async function animRuleB(){
+  const el = document.getElementById('ruleB');
+  el.innerHTML = digitsHTML('110') ;
+  await sleep(900);
+  el.innerHTML = digitsHTML('110') + '<div class="arrow">↓ −1</div>' + digitsHTML('109', c=>c==='9'?'nine':'')
+     + '<p class="muted">110 → 109 (a 9 appears — so the next step will be Rule A)</p>';
+}
+
+/* ---------- simulator ---------- */
+let simS, simN, simRows;
+function simLoad(v){ document.getElementById('simIn').value=v; simReset(); }
+function simReset(){
+  simS = strip0(document.getElementById('simIn').value.replace(/\D/g,'') || '1');
+  simN = 0;
+  document.getElementById('simTable').innerHTML = '<tr><th>#</th><th>rule</th><th>value</th></tr><tr><td>0</td><td>start</td><td class="mono">'+simS+'</td></tr>';
+  simDraw('');
+}
+function simDraw(note){
+  document.getElementById('simCur').innerHTML = digitsHTML(simS, c => /[01]/.test(c)? '' : 'nine');
+  document.getElementById('simNote').textContent = note;
+  document.getElementById('simCount').textContent = simN;
+}
+function simStep(){
+  if (simS === '0') { simDraw('Reached 0 — done!'); return false; }
+  const before = simS, r = f(simS);
+  simS = r.v; simN++;
+  const badge = r.r==='A' ? '<span class="badge b-par">A · parity</span>' : '<span class="badge b-min">B · −1</span>';
+  const t = document.getElementById('simTable');
+  t.insertAdjacentHTML('beforeend', `<tr><td>${simN}</td><td>${badge}</td><td class="mono">${simS}</td></tr>`);
+  t.parentElement.scrollTop = 1e9;
+  simDraw(r.r==='A' ? `${before} has a digit ≥ 2 → parity squash` : `${before} is all 0/1 → subtract 1`);
+  return simS !== '0';
+}
+async function simRun(){ for (let i=0;i<400 && simStep();i++) await sleep(250); }
+
+/* ---------- growth table ---------- */
+function fastCount(s){
+  let a = 0n; if (has2plus(s)){ s = squash(s); a = 1n; }
+  const b = BigInt('0b'+s); return a + b + b/2n;
+}
+function buildGrow(){
+  const ex = ['9','99','999','9999','99999','999999999','99999999999999999999','9'.repeat(60)];
+  let h = '<tr><th>x</th><th>digits</th><th>steps to reach 0</th></tr>';
+  for (const s of ex) h += `<tr><td class="mono">${s.length>20?s.slice(0,8)+'…'+s.slice(-4):s}</td><td>${s.length}</td><td class="mono">${fastCount(s).toLocaleString()}</td></tr>`;
+  document.getElementById('growTable').innerHTML = h;
+}
+
+/* ---------- insight 1 cases ---------- */
+async function animCases(){
+  const c1 = document.getElementById('case1'), c2 = document.getElementById('case2');
+  const A = '1011', B='10100';
+  c1.innerHTML = digitsHTML(A, (c,i)=> i===A.length-1?'o':'');
+  c2.innerHTML = digitsHTML(B, (c,i)=> i>=2?'e':'');
+  await sleep(1000);
+  c1.innerHTML += '<div class="arrow">↓ −1</div>' + digitsHTML('1010', (c,i)=> i===3?'o':'');
+  c2.innerHTML += '<div class="arrow">↓ −1 (borrow!)</div>' + digitsHTML('10099', (c,i)=> i>=3?'nine':(i===2?'e':''));
+  await sleep(1200);
+  c2.innerHTML += '<div class="arrow">↓ parity (9 is odd → 1)</div>' + digitsHTML('10011', (c,i)=> i>=3?'o':(i===2?'e':''));
+}
+
+/* ---------- binary countdown ---------- */
+let bcS, bcTot;
+function bcReset(){
+  let v = document.getElementById('bcIn').value.replace(/\D/g,'') || '1';
+  if (has2plus(v)) { v = strip0(squash(v)); document.getElementById('bcIn').value = v; }
+  bcS = strip0(v); bcTot = 0;
+  document.getElementById('bcTable').innerHTML = '<tr><th>decimal steps</th><th>binary b</th><th>cost</th><th>total</th></tr>'
+    + `<tr><td class="mono">${bcS}</td><td class="mono">${BigInt('0b'+bcS)}</td><td></td><td>0</td></tr>`;
+  document.getElementById('bcTotal').textContent = 0;
+}
+function bcStep(){
+  if (bcS === '0') return false;
+  const b = BigInt('0b'+bcS);
+  let path, cost;
+  if (bcS.endsWith('1')) { const n = strip0((BigInt(bcS)-1n).toString()); path = `${bcS} → ${n}`; bcS = n; cost = 1; }
+  else { const m = (BigInt(bcS)-1n).toString(); const n = strip0(squash(m)); path = `${bcS} → <span style="color:var(--red)">${m}</span> → ${n}`; bcS = n; cost = 2; }
+  bcTot += cost;
+  const t = document.getElementById('bcTable');
+  t.insertAdjacentHTML('beforeend', `<tr><td class="mono">${path}</td><td class="mono">${b} → ${b-1n}</td><td><span class="badge b-${cost}">+${cost}</span></td><td>${bcTot}</td></tr>`);
+  t.parentElement.scrollTop = 1e9;
+  document.getElementById('bcTotal').textContent = bcTot;
+  return bcS !== '0';
+}
+async function bcRunAll(){ for (let i=0;i<300 && bcStep();i++) await sleep(300); }
+
+/* ---------- counting blocks ---------- */
+function drawBlocks(){
+  const b = +document.getElementById('bSlider').value;
+  document.getElementById('bVal').textContent = b;
+  let h = '';
+  for (let v=b; v>=1; v--){
+    const odd = v%2===1;
+    h += `<div class="blk"><div class="cells">${odd?'<div class="cell o"></div>':'<div class="cell e"></div><div class="cell e"></div>'}</div>${v}</div>`;
+  }
+  document.getElementById('blocks').innerHTML = h;
+  document.getElementById('countFormula').innerHTML = `total = <b>${b}</b> + <b>⌊${b}/2⌋</b> = ${b} + ${Math.floor(b/2)} = <b>${b+Math.floor(b/2)}</b>`;
+}
+document.getElementById('bSlider').oninput = drawBlocks;
+
+/* ---------- final formula ---------- */
+function ffRun(){
+  let x = document.getElementById('ffIn').value.replace(/\D/g,'') || '1';
+  const big = has2plus(x), s = big ? squash(x) : x;
+  const b = BigInt('0b'+s), ans = ((big?1n:0n) + b + b/2n);
+  let h = `<p>x = <span class="mono">${x}</span></p>`;
+  h += big ? `<p>Has a digit ≥ 2 → squash: <span class="mono">${s}</span> &nbsp; <span class="badge b-par">+1</span></p>`
+           : `<p>Already only 0/1 → no squash &nbsp; <span class="badge b-par">+0</span></p>`;
+  h += `<p>b = <span class="mono">${s}</span>₂ = <b>${b}</b>, ⌊b/2⌋ = <b>${b/2n}</b></p>`;
+  h += `<p class="big">answer = ${big?1:0} + ${b} + ${b/2n} = <b style="color:var(--acc)">${ans}</b>`
+     + (ans >= MOD ? ` ≡ <b style="color:var(--acc)">${ans % MOD}</b> (mod 10⁹+7)` : '') + '</p>';
+  if (x.length <= 7) { let s2=strip0(x), n=0; while(s2!=='0'){ s2=f(s2).v; n++; } h += `<p class="muted">Brute-force check: ${n} steps ✓</p>`; }
+  document.getElementById('ffOut').innerHTML = h;
+}
+
+/* ---------- Horner ---------- */
+let hoS, hoI, hoB, hoH;
+function hoReset(){
+  const x = document.getElementById('hoIn').value.replace(/\D/g,'') || '1';
+  hoS = has2plus(x) ? squash(x) : x; hoI = 0; hoB = 0n; hoH = 0n;
+  hoDraw();
+  document.getElementById('hoTable').innerHTML = '<tr><th>i</th><th>bit</th><th>b = 2b+bit</th><th>half (skip last)</th></tr>';
+}
+function hoDraw(){
+  document.getElementById('hoDigits').innerHTML = [...hoS].map((c,i)=>
+    `<div class="d ${i<hoI?(c==='1'?'o':'e'):(i===hoI?'':'dim')}" style="${i===hoI?'outline:3px solid var(--acc)':''}">${c}</div>`).join('');
+}
+function hoStep(){
+  if (hoI >= hoS.length) return;
+  const bit = BigInt(hoS[hoI]), last = hoI === hoS.length-1;
+  if (!last) hoH = (hoH*2n + bit) % MOD;
+  hoB = (hoB*2n + bit) % MOD;
+  document.getElementById('hoTable').insertAdjacentHTML('beforeend',
+    `<tr><td>${hoI}</td><td>${bit}</td><td class="mono">${hoB}</td><td class="mono">${last?'<span class="muted">(skip) </span>':''}${hoH}</td></tr>`);
+  hoI++; hoDraw();
+}
+
+/* ---------- code ---------- */
+const CODE = [
+['',      '#include <bits/stdc++.h>'],
+['',      'using namespace std;'],
+['',      'const long long MOD = 1000000007LL;'],
+['',      ''],
+['',      'int main() {'],
+['',      '    ios::sync_with_stdio(false); cin.tie(nullptr);'],
+['',      '    int T; cin >> T;'],
+['',      '    while (T--) {'],
+['',      '        string x; cin >> x;'],
+['ans',   '        long long ans = 0;'],
+['check', '        bool only01 = true;'],
+['check', '        for (char c : x)'],
+['check', "            if (c != '0' && c != '1') only01 = false;"],
+['',      ''],
+['parity','        if (!only01) {                       // Rule A once'],
+['parity',"            for (char &c : x) c = ((c - '0') % 2) ? '1' : '0';"],
+['parity','            ans = 1;'],
+['parity','        }'],
+['',      ''],
+['loop',  '        long long b = 0, half = 0;           // b, floor(b/2) mod p'],
+['loop',  '        for (size_t i = 0; i < x.size(); i++) {'],
+['loop',  "            if (i + 1 < x.size()) half = (half * 2 + (x[i] - '0')) % MOD;"],
+['loop',  "            b = (b * 2 + (x[i] - '0')) % MOD;"],
+['loop',  '        }'],
+['ans',   '        ans = (ans + b + half) % MOD;'],
+['ans',   "        cout << ans << '\\n';"],
+['',      '    }'],
+['',      '    return 0;'],
+['',      '}'],
+];
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function hiLite(line){
+  let code = line, cm = '';
+  const k = line.indexOf('//'); if (k >= 0) { code = line.slice(0,k); cm = line.slice(k); }
+  let h = esc(code)
+    .replace(/('(?:\\.|[^'])')/g,'<span class="st">$1</span>')
+    .replace(/\b(int|long|bool|char|string|size_t|const|auto)\b/g,'<span class="ty">$1</span>')
+    .replace(/\b(for|if|while|return|using|namespace|true|false)\b/g,'<span class="kw">$1</span>')
+    .replace(/(#include)/,'<span class="kw">$1</span>')
+    .replace(/\b(\d+(?:LL)?)\b/g,'<span class="nu">$1</span>');
+  return h + (cm ? `<span class="cm">${esc(cm)}</span>` : '');
+}
+function hlCode(tag){
+  document.getElementById('codeBox').innerHTML = CODE.map(([t,l]) =>
+    tag && t===tag ? `<span class="hlLine">${hiLite(l)||' '}</span>` : hiLite(l)).join('\n');
+}
+
+/* ---------- slide enter hooks ---------- */
+const onEnter = {
+  0: animTitle, 1: ()=>{animRuleA(); animRuleB();}, 2: ()=>{ if(!simS) simReset(); },
+  3: buildGrow, 4: animCases, 5: ()=>{ if(!bcS) bcReset(); }, 6: drawBlocks,
+  7: ffRun, 8: ()=>{ if(!hoS) hoReset(); }, 9: ()=>hlCode('')
+};
+/* ---------- autoplay (press P, or open with ?autoplay=1) ---------- */
+const capEl = document.getElementById('caption');
+let autoplaying = false;
+// say(captionHTML, minMs, spokenText?)  — when narration audio exists (window.__ttsDur, injected by
+// recorder/record.js), each caption stays up at least as long as its audio clip.
+window.__capLog = [];
+async function say(text, ms, spoken){
+  capEl.classList.remove('on'); await sleep(250);
+  capEl.innerHTML = text; capEl.classList.add('on');
+  window.__capLog.push({ text, spoken: spoken || text, t: Date.now() / 1000 });
+  ms = ms ?? Math.max(2500, text.replace(/<[^>]+>/g,'').length * 55);
+  const dur = window.__ttsDur && window.__ttsDur[text];
+  await sleep(dur ? Math.max(ms, dur * 1000 + 500) : ms);
+}
+async function typeInto(id, text){
+  const el = document.getElementById(id); el.value = ''; el.focus();
+  for (const c of text){ el.value += c; await sleep(text.length > 12 ? 35 : 110); }
+  el.blur(); await sleep(300);
+}
+async function autoplay(){
+  if (autoplaying) return; autoplaying = true;
+  document.body.classList.add('autoplay');
+
+  go(0);
+  await say('Today: USACO problem 1588. Given x, how many times must we apply f until x becomes 0?', 5500,
+    'Today we will solve USACO problem 15 88. Given a number x, how many times must we apply the function f, until x becomes zero?');
+
+  go(1);
+  await say('f has two rules. <b>Rule A</b>: if x has any digit other than 0 or 1, replace every digit by its parity — odd → 1, even → 0.', 6500,
+    'f has two rules. Rule A: if x has any digit other than zero or one, replace every digit by its parity. Odd digits become one, even digits become zero.');
+  await say('<b>Rule B</b>: if x is made only of 0s and 1s, simply subtract 1.', 4500,
+    'Rule B: if x is made only of zeros and ones, simply subtract one.');
+  await say('We count the steps until x reaches 0, modulo 10⁹+7.', 3500,
+    'We count the steps until x reaches zero, modulo ten to the ninth, plus seven.');
+
+  go(2);
+  await say('Let\'s try the sample x = 210.', 2000, 'Let\'s try the sample, x equals 210.');
+  await typeInto('simIn', '210'); simReset(); await sleep(800);
+  const notes210 = [
+    ['210 has a 2 → Rule A gives 010 = 10', '210 has a 2, so Rule A turns it into zero one zero, which is 10.'],
+    ['10 is all 0/1 → subtract 1 → 9',      '10 has only zeros and ones, so we subtract one, and get 9.'],
+    ['9 is odd → Rule A gives 1',           '9 is not a zero or one. It is odd, so Rule A gives 1.'],
+    ['1 → subtract 1 → 0. Total: 4 steps!', 'Subtract one more, and we reach zero. Total: 4 steps!']];
+  for (const [n, sp] of notes210){ simStep(); await say(n, 2800, sp); }
+  await say('And x = 24680: every digit is even, so one Rule A step gives 0 immediately.', 2000,
+    'And for x equals 2 4 6 8 0, every digit is even, so a single Rule A step gives zero immediately.');
+  await typeInto('simIn', '24680'); simReset(); await sleep(700); simStep(); await sleep(2800);
+
+  go(3);
+  await say('But x can have <b>200,000 digits</b>, and the number of steps roughly doubles with each extra digit.', 6000,
+    'But x can have two hundred thousand digits, and the number of steps roughly doubles with each extra digit.');
+  await say('Simulating is hopeless — we need a formula.', 3500, 'Simulating is hopeless. We need a formula.');
+
+  go(4);
+  await say('Key idea ①: after at most one Rule A step, x contains only 0s and 1s.', 4500,
+    'Key idea number one: after at most one Rule A step, x contains only zeros and ones.');
+  await say('Case 1: x ends in 1. Subtracting 1 just turns that 1 into 0 — <b>1 step</b>.', 5000,
+    'Case one: x ends in a one. Subtracting one just turns that last one into a zero. That is one step.');
+  await say('Case 2: x ends in 1 followed by 0s. Subtracting borrows and creates 9s; Rule A turns the 9s into 1s — <b>2 steps</b>.', 7000,
+    'Case two: x ends in a one followed by zeros. Subtracting one borrows, and creates nines. Then Rule A turns the nines into ones. That is two steps.');
+  await say('1011 → 1010 → 1001 → 1000 → 0111 … that\'s <b>counting down in binary</b>!', 5500,
+    'One zero one one. One zero one zero. One zero zero one. One zero zero zero. One one one. Hey, that is counting down in binary!');
+
+  go(5);
+  await say('Key idea ②: read the 0/1 string as a binary number b. Every round lowers b by exactly 1.', 5000,
+    'Key idea number two: read the string of zeros and ones as a binary number, b. Every round lowers b by exactly one.');
+  await typeInto('bcIn', '1100'); bcReset(); await sleep(600);
+  await say('Watch: odd b costs 1 step, even b costs 2 steps.', 1500,
+    'Watch. When b is odd, the round costs one step. When b is even, it costs two steps.');
+  while (bcStep()) await sleep(1100);
+  await say('From b = 12 we used 18 steps.', 3000, 'Starting from b equals 12, we used 18 steps.');
+
+  go(6);
+  await say('Key idea ③: we visit b, b−1, …, 1. Odd values cost 1, even values cost 2.', 3000,
+    'Key idea number three: we visit b, b minus one, and so on, down to one. Odd values cost one step, even values cost two.');
+  const sl = document.getElementById('bSlider');
+  for (let v = 1; v <= 12; v++){ sl.value = v; drawBlocks(); await sleep(350); }
+  await say('So the total is <b>b + ⌊b/2⌋</b>. For b = 12: 12 + 6 = 18 ✓', 5000,
+    'So the total is b, plus the floor of b over two. For b equals 12, that is 12 plus 6, which is 18. It matches!');
+
+  go(7);
+  await say('Putting it together: answer = [x has a digit ≥ 2] + b + ⌊b/2⌋.', 4500,
+    'Putting it all together: the answer is b, plus the floor of b over two, plus one more if x had any digit of two or larger.');
+  await typeInto('ffIn', '210'); ffRun();
+  await say('For 210: squash to 010, b = 2, answer = 1 + 2 + 1 = 4 — matches the sample.', 5500,
+    'For 210: squash it to zero one zero, so b is 2. The answer is 1 plus 2 plus 1, which is 4. That matches the sample.');
+  await typeInto('ffIn', '1234567890123456789012345678901234567890'); ffRun();
+  await say('And the big sample gives 511620083, exactly the expected output.', 5000,
+    'And the big sample gives 5 1 1 6 2 0 0 8 3, exactly the expected output.');
+
+  go(8);
+  await say('With 200,000 digits we can\'t store b exactly — compute it mod 10⁹+7 with Horner\'s rule: b = 2b + bit.', 5500,
+    'With two hundred thousand digits, we cannot store b exactly. Instead, compute it modulo ten to the ninth plus seven, using Horner\'s rule: b becomes two b, plus the next bit.');
+  await typeInto('hoIn', '3141592'); hoReset(); await sleep(500);
+  for (let i = 0; i < 7; i++){ hoStep(); await sleep(i === 6 ? 300 : 900); }
+  await say('⌊b/2⌋ is just b without its last bit — so we use the same loop and skip the last digit.', 5500,
+    'And the floor of b over two is just b without its last bit. So we use the same loop, and skip the last digit.');
+
+  go(9);
+  await say('Step 3: the C++ solution.', 2500, 'Step three: the C plus plus solution.');
+  hlCode('check');  await say('First, check whether x has any digit other than 0 or 1.', 4000,
+    'First, check whether x has any digit other than zero or one.');
+  hlCode('parity'); await say('If so, apply the parity squash once and count 1 step.', 4000,
+    'If so, apply the parity squash once, and count one step.');
+  hlCode('loop');   await say('Then compute b and ⌊b/2⌋ modulo 10⁹+7 in one pass.', 4500,
+    'Then compute b, and the floor of b over two, modulo ten to the ninth plus seven, in a single pass.');
+  hlCode('ans');    await say('The answer is the sum. Linear time in the number of digits.', 4500,
+    'The answer is their sum. This runs in linear time in the number of digits.');
+  hlCode('');
+
+  go(10);
+  await say('Simplify → re-interpret as binary → count. Thanks for watching!', 6000,
+    'To recap: simplify, re-interpret as binary, then count. Thanks for watching!');
+  capEl.classList.remove('on');
+  await sleep(1000);
+  document.body.classList.remove('autoplay');
+  autoplaying = false;
+  window.__autoplayDone = true;
+}
+document.addEventListener('keydown', e=>{
+  if (e.target.tagName==='INPUT' && e.target.type==='text') return;
+  if (e.key==='p' || e.key==='P') autoplay();
+});
+
+const params = new URLSearchParams(location.search);
+go(+params.get('s') || 0);
+if (params.get('autoplay')) setTimeout(autoplay, 800);
+</script>
+</body>
+</html>
+Displaying index.html.
