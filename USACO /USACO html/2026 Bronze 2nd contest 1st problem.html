@@ -1,0 +1,1312 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>It's Mooin' Time IV</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=Spline+Sans+Mono:wght@400..700&display=swap" rel="stylesheet">
+<style>
+  /* ------------------------------------------------------------------
+     Design plan
+     Color : a dark lecture screen, pine black-green ground, mint for M,
+             hay amber for O; the two key colors carry every figure.
+     Type  : Bricolage Grotesque (display), Newsreader (reading),
+             Spline Sans Mono (keys, formulas, code).
+     Layout: slide deck with tabs, arrow-key navigation, dots, and an
+             autoplay narration track; keycaps are the recurring figure.
+     ------------------------------------------------------------------ */
+  :root{
+    color-scheme: dark;
+    --bg:#0a110d; --bg-2:#0d1510;
+    --panel:#111a15; --panel-2:#16221b;
+    --line:#24352b; --line-2:#34493c;
+    --ink:#eaf2ec; --ink-2:#b6c7bb; --ink-3:#81988b;
+    --m:#5fdfa2; --m-soft:#153023; --m-fill:#1c6b4d; --m-edge:#4fbf8c; --m-on:#eafff4;
+    --o:#f3a552; --o-soft:#33220f; --o-fill:#6b3c14; --o-edge:#e09a55; --o-on:#ffe9d2;
+    --red:#f08a80; --focus:#8ff0c0;
+    --code-bg:#070d0a; --code-com:#7d9487; --code-kw:#9fe3c4; --code-str:#f2ba88; --code-num:#e8c98a;
+    --radius:16px; --radius-sm:10px;
+    --font-display:"Bricolage Grotesque","Avenir Next","Segoe UI",sans-serif;
+    --font-body:"Newsreader","Iowan Old Style","Palatino Linotype",Georgia,serif;
+    --font-mono:"Spline Sans Mono",Menlo,Consolas,monospace;
+    --shadow:0 26px 60px -42px rgba(0,0,0,.95);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    background:var(--bg); color:var(--ink); font-family:var(--font-body); font-size:19px; line-height:1.5;
+    display:flex; flex-direction:column; height:100vh; height:100dvh; overflow:hidden;
+  }
+  body::before{
+    content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
+    background:
+      radial-gradient(1000px 520px at 82% -12%, rgba(95,223,162,.08), transparent 62%),
+      radial-gradient(760px 420px at -5% 108%, rgba(243,165,82,.06), transparent 62%);
+  }
+  a{color:var(--m)}
+  ::selection{background:var(--m-soft);color:var(--m-on)}
+
+  /* header */
+  header.top{
+    position:relative; z-index:3; display:flex; align-items:center; gap:16px;
+    padding:11px 28px; background:rgba(10,17,13,.94); border-bottom:1px solid var(--line);
+  }
+  .brand{display:flex; align-items:center; gap:10px; font-family:var(--font-mono);
+    font-size:.68rem; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3)}
+  .brand-dot{width:16px;height:16px;border-radius:5px;
+    background:linear-gradient(135deg,var(--m) 0 50%,var(--o) 50% 100%)}
+  header h1{font-family:var(--font-display); font-size:1.02rem; font-weight:600;
+    letter-spacing:-.015em; margin:0; white-space:nowrap}
+  .tabs{display:flex; gap:6px; margin-left:auto; flex-wrap:wrap}
+  .tab{padding:7px 13px; border-radius:9px; background:transparent; border:1px solid transparent;
+    color:var(--ink-3); cursor:pointer; font-family:var(--font-mono); font-size:.7rem;
+    letter-spacing:.04em; white-space:nowrap}
+  .tab:hover{color:var(--ink)}
+  .tab.on{color:var(--ink); border-color:var(--line-2); background:var(--panel)}
+
+  /* slide shell */
+  main{position:relative; z-index:1; flex:1; min-height:0; overflow:auto}
+  .slide{display:none; max-width:1180px; margin:0 auto; padding:34px 40px 72px}
+  .slide.on{display:block; animation:rise .38s ease both}
+  @keyframes rise{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:none}}
+  .eyebrow{font-family:var(--font-mono); font-size:.7rem; letter-spacing:.16em;
+    text-transform:uppercase; color:var(--ink-3); display:flex; align-items:center; gap:10px}
+  .eyebrow::before{content:""; width:22px; height:1px; background:var(--line-2)}
+  h2{font-family:var(--font-display); font-size:clamp(2rem,3.4vw,2.9rem); line-height:1.04;
+    letter-spacing:-.03em; margin:.18em 0 .3em; font-weight:700; text-wrap:balance}
+  h2 small{display:block; font-family:var(--font-mono); font-size:.68rem; letter-spacing:.15em;
+    text-transform:uppercase; color:var(--ink-3); font-weight:500; margin-top:12px}
+  h3{font-family:var(--font-display); font-size:1.1rem; margin:0 0 8px; font-weight:600; letter-spacing:-.01em}
+  p{margin:.45em 0 .8em; max-width:66ch}
+  p.lede{font-size:1.18rem; max-width:60ch}
+  .muted{color:var(--ink-2)}
+  .fine{font-family:var(--font-mono); font-size:.72rem; color:var(--ink-3); letter-spacing:.02em; line-height:1.65}
+  .mono{font-family:var(--font-mono)}
+  .row{display:flex; gap:18px; flex-wrap:wrap}
+  .grid2{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px}
+  .grid3{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px}
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    padding:18px 22px; min-width:0; box-shadow:var(--shadow)}
+  .card.hl{border-color:var(--m-edge);
+    background:linear-gradient(180deg, var(--m-soft), var(--panel) 72%)}
+  .card.amber{border-color:var(--o-edge); background:linear-gradient(180deg, var(--o-soft), var(--panel) 72%)}
+  .card.dim{background:var(--bg-2); box-shadow:none}
+  .card + .card{margin-top:0}
+
+  /* controls */
+  .btn{font-family:var(--font-mono); font-size:.76rem; letter-spacing:.02em; padding:8px 15px;
+    border-radius:9px; border:1px solid var(--m-edge); background:var(--m-fill); color:var(--m-on);
+    cursor:pointer; font-weight:600; transition:filter .15s, transform .15s}
+  .btn:hover{filter:brightness(1.12)}
+  .btn:active{transform:translateY(1px)}
+  .btn.sec{background:var(--panel-2); border-color:var(--line-2); color:var(--ink)}
+  .btn:disabled{opacity:.38; cursor:not-allowed}
+  .btn:focus-visible,.tab:focus-visible,.chip:focus-visible,.seg button:focus-visible,
+  .inp:focus-visible,.key:focus-visible{outline:2px solid var(--focus); outline-offset:2px}
+  .btnrow{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:10px}
+  .inp{background:var(--bg-2); border:1px solid var(--line-2); border-radius:9px; color:var(--ink);
+    font-family:var(--font-mono); font-size:1rem; padding:8px 12px; width:250px; letter-spacing:.12em}
+  #targetIn{max-width:100%}
+  .inp::placeholder{color:var(--ink-3); letter-spacing:.04em}
+</style>
+<style>
+  /* keycaps */
+  .tiles{display:flex; gap:8px; flex-wrap:wrap; align-items:center; min-height:56px}
+  .tile{width:46px; height:54px; border-radius:11px; display:flex; align-items:center;
+    justify-content:center; font-family:var(--font-mono); font-size:1.3rem; font-weight:700;
+    border:1px solid transparent; box-shadow:inset 0 -3px 0 rgba(0,0,0,.24), 0 1px 0 rgba(255,255,255,.05);
+    transition:background .2s, border-color .2s, color .2s}
+  .tile.m{background:var(--m-fill); border-color:var(--m-edge); color:var(--m-on)}
+  .tile.o{background:var(--o-fill); border-color:var(--o-edge); color:var(--o-on)}
+  .tile.sm{width:32px; height:38px; font-size:.95rem; border-radius:8px; box-shadow:inset 0 -2px 0 rgba(0,0,0,.24)}
+  .tile.ghost{background:transparent; border:1px dashed var(--line-2); color:var(--ink-3)}
+  .tile.flip{animation:flip .36s ease}
+  @keyframes flip{0%{transform:rotateX(0)} 45%{transform:rotateX(88deg)} 100%{transform:rotateX(0)}}
+  .tile.fresh{animation:fresh .28s ease}
+  @keyframes fresh{from{transform:translateY(-9px) scale(.82); opacity:0} to{transform:none; opacity:1}}
+  .screen{background:var(--bg-2); border:1px solid var(--line); border-radius:12px;
+    padding:12px 14px; min-height:86px; display:flex; flex-direction:column; justify-content:center}
+  .logline{display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-top:10px;
+    font-family:var(--font-mono); font-size:.7rem; color:var(--ink-3); letter-spacing:.03em}
+  .logline .tile.sm{width:26px; height:30px; font-size:.8rem}
+  .samples{display:flex; flex-direction:column; gap:10px}
+  .sample-row{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+  .sample-row .s-lab{width:88px; flex:none; color:var(--ink-3)}
+  .sample-row .s-arrow{padding:0 4px; flex:none}
+  .tablewrap{overflow-x:auto}
+  .keypad{display:flex; gap:10px; margin-top:12px; flex-wrap:wrap}
+  .key{flex:1 1 150px; min-width:0; text-align:left; cursor:pointer; border-radius:12px;
+    padding:12px 16px; border:1px solid transparent; font-family:var(--font-mono);
+    display:flex; flex-direction:column; gap:2px; transition:transform .12s, filter .15s}
+  .key:hover{filter:brightness(1.12)}
+  .key:active{transform:translateY(1px)}
+  .key .glyph{font-family:var(--font-display); font-size:1.9rem; font-weight:800; line-height:1}
+  .key .sub{font-size:.66rem; letter-spacing:.04em; opacity:.78}
+  .key.m{background:var(--m-fill); border-color:var(--m-edge); color:var(--m-on)}
+  .key.o{background:var(--o-fill); border-color:var(--o-edge); color:var(--o-on)}
+
+  /* equations */
+  .eq{display:flex; align-items:center; gap:14px; padding:10px 14px; border-radius:10px;
+    background:var(--bg-2); border:1px solid var(--line); font-family:var(--font-mono); font-size:.9rem}
+  .eq + .eq{margin-top:8px}
+  .eq .lhs{flex:1; min-width:0}
+  .eq .res{color:var(--m); font-weight:700; white-space:nowrap}
+
+  /* chart */
+  .chart{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    padding:14px 16px 8px; box-shadow:var(--shadow); overflow-x:auto}
+  .chart svg{display:block; width:100%; height:auto}
+  .chart .chart-grid{stroke:var(--line); stroke-width:1; stroke-dasharray:3 5}
+  .chart .chart-axis-label{fill:var(--ink-3); font-family:var(--font-mono); font-size:11px}
+  .chart .chart-axis-title{fill:var(--ink-3); font-family:var(--font-mono); font-size:11px; letter-spacing:.04em}
+  .chart .chart-q-label{fill:var(--ink-2); font-family:var(--font-mono); font-size:11px; font-weight:600}
+  .chart .chart-target{font-family:var(--font-mono); font-size:16px; font-weight:700}
+  .chart .chart-target.target-m{fill:var(--m)}
+  .chart .chart-target.target-o{fill:var(--o)}
+  .chart .chart-key{font-family:var(--font-mono); font-size:12px; font-weight:600}
+  .chart .chart-key.key-m{fill:var(--ink-3)}
+  .chart .chart-key.key-o{fill:var(--o)}
+  .chart .chart-p-label{fill:var(--ink-2); font-family:var(--font-mono); font-size:11px}
+  .chart .chart-line{fill:none; stroke:var(--m); stroke-width:2.4; stroke-linejoin:round}
+  .chart .chart-dot{fill:var(--m); stroke:var(--panel); stroke-width:2.6}
+  .chart .cursor-band{fill:var(--o); opacity:.1}
+  .chart .cursor-line{stroke:var(--o); stroke-width:1.5; stroke-dasharray:4 4; opacity:.7}
+  .chart .cursor-dot{fill:var(--o); stroke:var(--panel); stroke-width:2.6}
+  .chart-cap{font-family:var(--font-mono); font-size:.7rem; color:var(--ink-3);
+    letter-spacing:.02em; line-height:1.65; margin:8px 2px 4px}
+
+  /* segmented + stats */
+  .seg{display:inline-flex; border:1px solid var(--line); border-radius:9px; overflow:hidden}
+  .seg button{background:transparent; border:0; border-right:1px solid var(--line); color:var(--ink-2);
+    padding:7px 14px; font-family:var(--font-mono); font-size:.78rem; cursor:pointer}
+  .seg button:last-child{border-right:0}
+  .seg button.on{background:var(--m-fill); color:var(--m-on)}
+  .stats{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line);
+    border:1px solid var(--line); border-radius:12px; overflow:hidden}
+  .stat{background:var(--panel); padding:12px 16px}
+  .stat .n{font-family:var(--font-display); font-size:1.8rem; font-weight:700; line-height:1}
+  .stat .l{font-family:var(--font-mono); font-size:.64rem; letter-spacing:.13em;
+    text-transform:uppercase; color:var(--ink-3); margin-top:7px}
+  .stat.zero .n{color:var(--m)}
+
+  /* chips */
+  .chips{display:grid; grid-template-columns:repeat(auto-fill,minmax(122px,1fr)); gap:8px}
+  .chip{background:var(--panel); border:1px solid var(--line); border-radius:10px;
+    padding:8px 10px; cursor:pointer; font-family:var(--font-mono); font-size:.76rem;
+    color:var(--ink); text-align:left; transition:border-color .15s, background .15s}
+  .chip:hover{border-color:var(--m-edge); background:var(--panel-2)}
+  .chip .k{display:block; color:var(--ink-3); font-size:.66rem; margin-top:3px}
+  .chip .m{color:var(--m)}
+  .chip .o{color:var(--o)}
+
+  /* boundary figure */
+  .boundary{display:flex; flex-direction:column; gap:5px; font-family:var(--font-mono); font-size:.72rem}
+  .bline{display:flex; align-items:center; gap:10px}
+  .bline .lab{width:46px; flex:none; color:var(--ink-3); letter-spacing:.08em; text-transform:uppercase; font-size:.6rem}
+  .bgrid{display:grid; grid-template-columns:34px 22px 34px 22px 34px 22px 34px 22px 34px; align-items:center}
+  .bsym{text-align:center; color:var(--ink-3); font-size:.9rem}
+  .bsym.diff{color:var(--o); font-weight:700}
+  .bsym.copy{color:var(--m); font-size:.56rem; letter-spacing:.05em}
+  .btile{width:34px; height:40px; border-radius:8px; display:flex; align-items:center;
+    justify-content:center; font-weight:700; font-size:1rem; border:1px solid transparent}
+  .btile.m{background:var(--m-fill); border-color:var(--m-edge); color:var(--m-on)}
+  .btile.o{background:var(--o-fill); border-color:var(--o-edge); color:var(--o-on)}
+
+  /* tables + figures */
+  table.grow{border-collapse:collapse; width:100%; font-family:var(--font-mono);
+    font-size:.84rem; margin-top:4px}
+  table.grow th{text-align:left; font-weight:500; color:var(--ink-3); font-size:.64rem;
+    letter-spacing:.11em; text-transform:uppercase; padding:6px 10px; border-bottom:1px solid var(--line)}
+  table.grow td{padding:10px; border-bottom:1px solid var(--line); white-space:nowrap}
+  table.grow td.num{text-align:right; color:var(--ink)}
+  table.grow tr:last-child td{border-bottom:0}
+  .figure-svg{width:100%; height:auto; display:block}
+  .fig-label{fill:var(--ink-3); font-family:var(--font-mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase}
+  .fig-tile{stroke-width:1}
+  .fig-tile.tile-o{fill:var(--o-fill); stroke:var(--o-edge)}
+  .fig-tile.tile-m{fill:var(--m-fill); stroke:var(--m-edge)}
+  .glyph{font-family:var(--font-mono); font-size:21px; font-weight:700; text-anchor:middle}
+  .glyph-o{fill:var(--o-on)} .glyph-m{fill:var(--m-on)}
+  .flip-path{fill:none; stroke:var(--o); stroke-width:1.5; marker-end:url(#flip-arrow)}
+  .arrow-head{fill:var(--o)}
+  .flip-label{fill:var(--ink-2); font-family:var(--font-mono); font-size:10px}
+  .flip-label.muted{fill:var(--ink-3)}
+  figcaption{font-family:var(--font-mono); font-size:.7rem; color:var(--ink-3);
+    line-height:1.65; letter-spacing:.02em; margin-top:8px}
+
+  /* code */
+  .code-grid{grid-template-columns:minmax(0,1.55fr) minmax(0,1fr)}
+  pre.code{background:var(--code-bg); border:1px solid var(--line); border-radius:14px;
+    padding:14px 16px 16px; font-family:var(--font-mono); font-size:.76rem; line-height:1.62;
+    overflow:auto; margin:0; color:var(--ink); counter-reset:line}
+  #codeBox{max-height:min(62vh, 620px)}
+  #solveChart{max-width:720px; margin-left:auto; margin-right:auto}
+  .code-line{display:block; white-space:pre; padding-left:34px; position:relative; border-left:2px solid transparent}
+  .code-line::before{counter-increment:line; content:counter(line); position:absolute; left:8px;
+    width:18px; text-align:right; color:var(--ink-3); opacity:.6}
+  .code-line.hl{background:rgba(95,223,162,.09); border-left-color:var(--m)}
+  .tok-kw{color:var(--code-kw)} .tok-str{color:var(--code-str)}
+  .tok-num{color:var(--code-num)} .tok-com{color:var(--code-com); font-style:italic}
+
+  /* footer + caption */
+  footer.bot{position:relative; z-index:3; display:flex; align-items:center; gap:18px;
+    padding:10px 28px; background:rgba(10,17,13,.94); border-top:1px solid var(--line);
+    font-family:var(--font-mono); font-size:.68rem; color:var(--ink-3); letter-spacing:.05em}
+  .dots{display:flex; gap:6px; margin:0 auto}
+  .dots span{width:8px; height:8px; border-radius:50%; background:var(--line-2);
+    cursor:pointer; transition:background .2s, transform .2s}
+  .dots span.on{background:var(--m); transform:scale(1.3)}
+  #caption{position:fixed; left:50%; bottom:64px; transform:translateX(-50%); max-width:1100px;
+    width:max-content; background:rgba(6,11,8,.94); border:1px solid var(--line-2);
+    border-radius:12px; padding:11px 22px; font-family:var(--font-body); font-size:1.24rem;
+    line-height:1.4; text-align:center; opacity:0; transition:opacity .35s; pointer-events:none; z-index:20}
+  #caption.on{opacity:1}
+  body.autoplay{cursor:none}
+
+  /* responsive */
+  @media (max-width:900px){
+    header.top{flex-wrap:wrap; gap:8px 14px; padding:10px 18px}
+    header h1{font-size:.95rem}
+    .tabs{margin-left:0; order:3; width:100%}
+    .slide{padding:24px 20px 60px}
+    .grid2,.grid3{grid-template-columns:minmax(0,1fr)}
+    .row > .card{flex:1 1 100%}
+  }
+  @media (max-width:620px){
+    body{font-size:17px}
+    h2{font-size:1.85rem}
+    .slide{padding:20px 16px 56px}
+    .card{padding:14px 16px}
+    .tile{width:38px; height:45px; font-size:1.05rem}
+    .tile.sm{width:28px; height:33px; font-size:.82rem}
+    .key .glyph{font-size:1.5rem}
+    .chart .chart-target{font-size:36px}
+    .chart .chart-key{font-size:28px}
+    .chart .chart-q-label{display:none}
+    .chart .chart-axis-label{font-size:26px}
+    .chart .chart-axis-title{font-size:26px}
+    .chart .chart-p-label{font-size:26px}
+    footer.bot .hint{display:none}
+    #slideLabel{max-width:42%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+    .chips{grid-template-columns:repeat(auto-fill,minmax(96px,1fr))}
+    table.grow{font-size:.76rem}
+    table.grow td,table.grow th{padding:8px 6px; white-space:normal}
+    #codeBox{max-height:52vh}
+    .eq{flex-direction:column; align-items:flex-start; gap:4px}
+    #caption{font-size:1rem; width:calc(100vw - 32px); bottom:54px}
+    footer.bot{padding:8px 16px; gap:10px; font-size:.6rem}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .slide.on{animation:none}
+    .tile.flip,.tile.fresh{animation:none}
+    *{transition-duration:.01ms !important}
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><span class="brand-dot"></span> USACO 2026 · Bronze 1</div>
+  <h1>It's Mooin' Time IV</h1>
+  <nav class="tabs" aria-label="Sections">
+    <button class="tab" type="button" data-go="1">① The mechanic</button>
+    <button class="tab" type="button" data-go="3">② The proof</button>
+    <button class="tab" type="button" data-go="8">③ Solvers</button>
+    <button class="tab" type="button" data-go="10">④ The code</button>
+  </nav>
+</header>
+<main>
+<!-- 0 · TITLE -->
+<section class="slide" data-name="Title">
+  <div style="max-width:840px;margin:5vh auto 0;text-align:center">
+    <div class="eyebrow" style="justify-content:center">USACO 2026 · Second Contest · Bronze · Problem 1</div>
+    <h2 style="font-size:clamp(2.5rem,6.4vw,4.7rem);letter-spacing:-.045em;margin-top:16px">
+      It's Mooin' Time <span style="font-family:var(--font-body);font-style:italic;font-weight:400;color:var(--m)">IV</span>
+    </h2>
+    <p class="lede" style="margin:6px auto 14px">Two keys and a virus. M appends M; O flips every letter already on screen. Can Bessie type a target string of M and O? Yes — always — and there is exactly one way to do it.</p>
+    <div style="display:flex;gap:8px;margin:0 0 26px;flex-wrap:wrap;justify-content:center">
+      <span class="fine" style="border:1px solid var(--line);border-radius:999px;padding:5px 12px">always YES</span>
+      <span class="fine" style="border:1px solid var(--line);border-radius:999px;padding:5px 12px">unique keystrokes</span>
+      <span class="fine" style="border:1px solid var(--line);border-radius:999px;padding:5px 12px">O(N) per test</span>
+    </div>
+    <div class="card" style="max-width:540px;margin:0 auto;text-align:left">
+      <div class="fine">the smallest sample</div>
+      <div class="screen" style="margin-top:8px;min-height:78px">
+        <div class="tiles" id="titleTiles"></div>
+      </div>
+      <div class="btnrow">
+        <button class="btn sec" type="button" onclick="titleDemo()">▶ replay</button>
+        <span class="fine" id="titleStatus">keys O M O → screen M O O</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 1 · MECHANIC + LAB -->
+<section class="slide" data-name="The mechanic">
+  <div class="eyebrow">The mechanic</div>
+  <h2>Two keys, one rule that looks backwards</h2>
+  <p>M appends an M. O flips every letter already on screen, then appends an O. The O you press is never flipped by its own keystroke.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>M · append</h3>
+      <div class="tiles" style="min-height:0;margin:6px 0 10px">
+        <span class="tile o sm">O</span><span class="tile m sm">M</span>
+        <span class="fine" style="padding:0 4px">press M →</span>
+        <span class="tile o sm">O</span><span class="tile m sm">M</span><span class="tile m sm">M</span>
+      </div>
+      <p class="fine" style="margin:0">An M lands at the end. Nothing already on screen moves.</p>
+    </div>
+    <div class="card amber">
+      <h3>O · flip, then append</h3>
+      <div class="tiles" style="min-height:0;margin:6px 0 10px">
+        <span class="tile o sm">O</span><span class="tile m sm">M</span>
+        <span class="fine" style="padding:0 4px">press O →</span>
+        <span class="tile m sm">M</span><span class="tile o sm">O</span><span class="tile o sm">O</span>
+      </div>
+      <p class="fine" style="margin:0">Every earlier letter flips M↔O. Then a fresh, unflipped O lands.</p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:18px">
+    <div class="fine">forward lab · press the keys and watch the screen</div>
+    <div class="screen" style="margin-top:8px">
+      <div class="tiles" id="labTiles"></div>
+    </div>
+    <div class="keypad">
+      <button class="key m" type="button" data-key="M">
+        <span class="glyph">M</span><span class="sub">append M</span>
+      </button>
+      <button class="key o" type="button" data-key="O">
+        <span class="glyph">O</span><span class="sub">flip all, then append O</span>
+      </button>
+    </div>
+    <div class="logline" id="labLog">keys <span class="fine">none yet</span></div>
+    <div class="btnrow">
+      <button class="btn sec" type="button" data-preset="OMO">Sample OMO → MOO</button>
+      <button class="btn sec" type="button" data-preset="MOOMO">Sample MOOMO → OOMOO</button>
+      <button class="btn sec" type="button" data-lab-clear>Clear</button>
+      <span class="fine" id="labStatus" role="status"></span>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-top:18px">
+    <div class="card dim"><p style="margin:0"><b style="color:var(--m)">A letter flips once per later O.</b> <span class="muted">An O typed before it never touches it.</span></p></div>
+    <div class="card dim"><p style="margin:0"><b style="color:var(--o)">The key you press is not the letter that stays.</b> <span class="muted">A later O can rewrite letters already on screen.</span></p></div>
+  </div>
+</section>
+
+<!-- 2 · THE TASK -->
+<section class="slide" data-name="The task">
+  <div class="eyebrow">The task</div>
+  <h2>What the judge asks</h2>
+  <p class="muted">Read the target, decide whether it can be typed, and — when asked — print the keys. The sum of all N is at most 4·10<sup>5</sup>.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>Input</h3>
+      <p>The first line is <b class="mono">T k</b>, not just T. <span class="mono">k</span> is 0 or 1 for the whole run.</p>
+      <p>Each test then gives <b class="mono">N</b> and a string <b class="mono">S</b> of M and O.</p>
+      <p class="fine" style="margin-bottom:0">Σ N ≤ 4·10<sup>5</sup> · use fast I/O with that many characters</p>
+    </div>
+    <div class="card amber">
+      <h3>Output</h3>
+      <p>Always <b>YES</b>: every target is reachable. With <span class="mono">k = 0</span> that one line is the whole answer.</p>
+      <div class="btnrow" style="margin-top:6px">
+        <button class="btn sec" type="button" data-k="0">k = 0</button>
+        <button class="btn sec" type="button" data-k="1">k = 1</button>
+      </div>
+      <pre class="code" id="kOut" style="margin-top:10px;font-size:.82rem;padding:12px 14px"></pre>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:18px">
+    <h3>Samples, checked</h3>
+    <div class="samples">
+      <div class="sample-row">
+        <span class="fine s-lab">target MOO</span>
+        <div class="tiles" style="min-height:0">
+          <span class="tile m sm">M</span><span class="tile o sm">O</span><span class="tile o sm">O</span>
+        </div>
+        <span class="fine s-arrow">→ keys</span>
+        <div class="tiles" style="min-height:0">
+          <span class="tile o sm">O</span><span class="tile m sm">M</span><span class="tile o sm">O</span>
+        </div>
+      </div>
+      <div class="sample-row">
+        <span class="fine s-lab">target OOMOO</span>
+        <div class="tiles" style="min-height:0">
+          <span class="tile o sm">O</span><span class="tile o sm">O</span><span class="tile m sm">M</span><span class="tile o sm">O</span><span class="tile o sm">O</span>
+        </div>
+        <span class="fine s-arrow">→ keys</span>
+        <div class="tiles" style="min-height:0">
+          <span class="tile m sm">M</span><span class="tile o sm">O</span><span class="tile o sm">O</span><span class="tile m sm">M</span><span class="tile o sm">O</span>
+        </div>
+      </div>
+    </div>
+    <p class="fine" style="margin:12px 0 0" id="kNote">With k = 1, print N characters. Any valid sequence is accepted, and there is only one.</p>
+  </div>
+</section>
+<!-- 3 · WHY NOT SEARCH -->
+<section class="slide" data-name="Why not search">
+  <div class="eyebrow">First instinct · rejected</div>
+  <h2>Why not just search?</h2>
+  <p>Each keystroke is M or O, so there are <b>2<sup>N</sup></b> keystroke strings of length N. Simulating one is cheap. Trying all of them is not.</p>
+  <div class="card">
+    <div class="tablewrap"><table class="grow" id="growTable"></table></div>
+    <p class="fine" style="margin:10px 0 0">2<sup>400000</sup> is about 10<sup>120412</sup> — more strings than there are atoms in the observable universe.</p>
+  </div>
+  <div class="card hl" style="margin-top:18px">
+    <p style="margin:0"><b>The simulation has to be inverted, not searched.</b> <span class="muted">Track one number per position instead of every whole string.</span></p>
+  </div>
+</section>
+
+<!-- 4 · INSIGHT 1 -->
+<section class="slide" data-name="Insight ① · later O's">
+  <div class="eyebrow">Insight 01</div>
+  <h2>Only later O's touch a letter</h2>
+  <div class="grid2" style="align-items:start">
+    <div>
+      <p>Fix a position. The letter typed there is flipped once by every O typed <b>after</b> it. O's typed before it never affect it, and its own keystroke never flips it.</p>
+      <p>So the final letter is the typed letter, XOR the parity of the number of later O's.</p>
+      <div class="card dim">
+        <p style="margin:0">In the keys <b class="mono">O M O</b>, the only O after positions 1 and 2 is the one at position 3. It flips both of them once. Position 3 stays as typed, turning <b class="mono">O M O</b> into <b class="mono" style="color:var(--m)">M O O</b>.</p>
+      </div>
+    </div>
+    <figure class="card" style="margin:0">
+      <svg viewBox="0 0 680 272" class="figure-svg" role="img" aria-label="Keys O, M, O produce the final string M, O, O. The O at position three flips positions one and two once each. Position three is never flipped.">
+        <defs>
+          <marker id="flip-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path class="arrow-head" d="M 0 0 L 10 5 L 0 10 z"></path>
+          </marker>
+        </defs>
+        <text x="18" y="28" class="fig-label">keys</text>
+        <text x="18" y="150" class="fig-label">final</text>
+        <rect class="fig-tile tile-o" x="101" y="34" width="58" height="58" rx="10"></rect>
+        <text class="glyph glyph-o" x="130" y="63" dominant-baseline="central">O</text>
+        <rect class="fig-tile tile-m" x="311" y="34" width="58" height="58" rx="10"></rect>
+        <text class="glyph glyph-m" x="340" y="63" dominant-baseline="central">M</text>
+        <rect class="fig-tile tile-o" x="521" y="34" width="58" height="58" rx="10"></rect>
+        <text class="glyph glyph-o" x="550" y="63" dominant-baseline="central">O</text>
+        <text x="550" y="20" text-anchor="middle" class="flip-label muted">the only later O</text>
+        <path class="flip-path" d="M 545 95 C 490 138, 300 144, 143 151"></path>
+        <path class="flip-path" d="M 545 95 C 520 132, 440 143, 351 151"></path>
+        <rect class="fig-tile tile-m" x="101" y="156" width="58" height="58" rx="10"></rect>
+        <text class="glyph glyph-m" x="130" y="185" dominant-baseline="central">M</text>
+        <rect class="fig-tile tile-o" x="311" y="156" width="58" height="58" rx="10"></rect>
+        <text class="glyph glyph-o" x="340" y="185" dominant-baseline="central">O</text>
+        <rect class="fig-tile tile-o" x="521" y="156" width="58" height="58" rx="10"></rect>
+        <text class="glyph glyph-o" x="550" y="185" dominant-baseline="central">O</text>
+        <text x="130" y="238" text-anchor="middle" class="flip-label muted">flipped 1×</text>
+        <text x="340" y="238" text-anchor="middle" class="flip-label muted">flipped 1×</text>
+        <text x="550" y="238" text-anchor="middle" class="flip-label muted">flipped 0×</text>
+      </svg>
+      <figcaption>The ledger for O M O. Arrows are flips caused by later O's. Odd flip counts toggle the letter; even counts leave it alone.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- 5 · INSIGHT 2 -->
+<section class="slide" data-name="Insight ② · cancellation">
+  <div class="eyebrow">Insight 02</div>
+  <h2>The pressed letter cancels out</h2>
+  <p>Let <b>P</b> be the total number of O keystrokes, and <b>q<sub>j</sub></b> the number of O's typed before position j. Then an O at position j has exactly <b>P − q<sub>j</sub></b> later O's behind it.</p>
+  <div class="card">
+    <div class="eq"><span class="lhs"><span style="color:var(--m)">M</span> &nbsp; 0 ⊕ (P − q<sub>j</sub>)</span><span class="res">≡ P − q<sub>j</sub></span></div>
+    <div class="eq"><span class="lhs"><span style="color:var(--o)">O</span> &nbsp; 1 ⊕ (P − q<sub>j</sub> − 1)</span><span class="res">≡ P − q<sub>j</sub></span></div>
+    <p class="fine" style="margin:10px 0 0">With key M, the typed letter is 0. With key O, the typed letter is 1 but that same O also adds one to the count — the two cancel modulo 2.</p>
+  </div>
+  <div class="card hl" style="margin-top:18px">
+    <p style="margin:0"><b>The final string depends only on where the O's sit in the key sequence</b> <span class="muted">— not on which key is supposed to have produced each position.</span></p>
+  </div>
+</section>
+<!-- 6 · INSIGHT 3 -->
+<section class="slide" data-name="Insight ③ · staircase">
+  <div class="eyebrow">Insight 03</div>
+  <h2>Parity pins the O-count</h2>
+  <p>Read the formula backwards. Position 1 gives <b class="mono">P ≡ S<sub>1</sub></b>, so substituting into <b class="mono">S<sub>j</sub> ≡ P − q<sub>j</sub></b> gives <b class="mono">q<sub>j</sub> ≡ S<sub>1</sub> + S<sub>j</sub></b> (mod 2). The parity of the count is fixed by the target.</p>
+  <p>The count starts at <b>q<sub>1</sub> = 0</b> and can only stay or rise by one. A rise flips the parity; a stay does not. <b>So the count rises exactly where the target changes letter — the staircase is forced, with no choice left.</b></p>
+  <div class="row" style="align-items:center;gap:10px;margin:4px 0 10px">
+    <span class="fine">target</span>
+    <div class="seg" id="stairChooser">
+      <button type="button" data-t="OOMOO" class="on">OOMOO</button>
+      <button type="button" data-t="MOO">MOO</button>
+      <button type="button" data-t="MOMOM">MOMOM</button>
+      <button type="button" data-t="OOOO">OOOO</button>
+    </div>
+  </div>
+  <div class="chart" id="stairChart"></div>
+  <div class="chart-cap" id="stairCap"></div>
+</section>
+
+<!-- 7 · INSIGHT 4 + RULE -->
+<section class="slide" data-name="Insight ④ · the rule">
+  <div class="eyebrow">Insight 04</div>
+  <h2>The last key is the last letter</h2>
+  <p>One value is still open. After the final position the count becomes <b class="mono">P = q<sub>N</sub> + c<sub>N</sub></b>, where c<sub>N</sub> is the final key. We need P ≡ S<sub>1</sub>, and q<sub>N</sub> ≡ S<sub>1</sub> + S<sub>N</sub>, so the only key that works is <b class="mono">c<sub>N</sub> = S<sub>N</sub></b>.</p>
+  <p>In plain letters: the last keystroke equals the last target letter. The one remaining bit of freedom is spent by the parity equation.</p>
+
+  <div class="grid2" style="align-items:start">
+    <div class="card">
+      <div class="fine">OOMOO · last key, resolved</div>
+      <div class="eq" style="margin-top:8px"><span class="lhs">q<sub>N</sub> = 2 &nbsp;·&nbsp; S<sub>1</sub> = 0 &nbsp;→&nbsp; P must be odd</span></div>
+      <div class="grid2" style="gap:10px;margin-top:10px">
+        <div class="card dim" style="padding:12px 14px;box-shadow:none">
+          <b class="mono">P = 2 + 0 = 2</b>
+          <div class="fine" style="color:var(--red);margin-top:4px">EVEN · rejected</div>
+        </div>
+        <div class="card" style="padding:12px 14px;border-color:var(--m-edge);background:var(--m-soft);box-shadow:none">
+          <b class="mono">P = 2 + 1 = 3</b>
+          <div class="fine" style="color:var(--m);margin-top:4px">ODD · last key O</div>
+        </div>
+      </div>
+      <p class="fine" style="margin:10px 0 0">Only one of the two last keys matches the parity. The target picks it.</p>
+    </div>
+
+    <div class="card hl">
+      <h3>The rule</h3>
+      <p style="margin:4px 0 10px">For <b class="mono">j &lt; N</b>: press <b class="mono" style="color:var(--o)">O</b> exactly when <b class="mono">S<sub>j</sub> ≠ S<sub>j+1</sub></b>; otherwise press M. The last key is <b class="mono">c<sub>N</sub> = S<sub>N</sub></b>.</p>
+      <div class="boundary">
+        <div class="bline"><span class="lab">target</span>
+          <div class="bgrid">
+            <span class="btile o">O</span><span></span><span class="btile o">O</span><span></span><span class="btile m">M</span><span></span><span class="btile o">O</span><span></span><span class="btile o">O</span>
+          </div>
+        </div>
+        <div class="bline"><span class="lab">vs next</span>
+          <div class="bgrid">
+            <span></span><span class="bsym">=</span><span></span><span class="bsym diff">≠</span><span></span><span class="bsym diff">≠</span><span></span><span class="bsym">=</span><span></span>
+          </div>
+        </div>
+        <div class="bline"><span class="lab">key</span>
+          <div class="bgrid">
+            <span class="btile m">M</span><span></span><span class="btile o">O</span><span></span><span class="btile o">O</span><span></span><span class="btile m">M</span><span></span><span class="btile o">O</span>
+          </div>
+        </div>
+      </div>
+      <p class="fine" style="margin:12px 0 0">OOMOO changes at the 2–3 and 3–4 boundaries. Those become O keys; the unchanged boundaries become M; the last O is copied. Result: <b style="color:var(--m)">M O O M O</b>.</p>
+    </div>
+  </div>
+
+  <div class="card dim" style="margin-top:16px">
+    <p style="margin:0"><b>Every target has exactly one keystroke string, so the typing map is a bijection — and the answer is always YES.</b></p>
+  </div>
+</section>
+
+<!-- 8 · SOLVER LAB -->
+<section class="slide" data-name="Solver lab">
+  <div class="eyebrow">Solver lab</div>
+  <h2>Point it at any moo</h2>
+  <p class="muted">Change the target. The solver computes the unique keystroke string, then replays the typing one key at a time. The staircase tracks how many O's have been typed before each position.</p>
+  <div class="card">
+    <div class="row" style="align-items:center;gap:10px">
+      <label class="fine" for="targetIn">target</label>
+      <input class="inp" id="targetIn" value="OOMOO" maxlength="16" spellcheck="false" autocomplete="off" aria-label="Target string">
+      <button class="btn" type="button" id="targetApply">Solve</button>
+      <span class="fine" id="targetNote">M and O only · up to 16 letters</span>
+    </div>
+    <div class="grid2" style="margin-top:14px">
+      <div>
+        <div class="fine">unique keystrokes</div>
+        <div class="tiles" id="keyStrip" style="margin-top:6px"></div>
+        <div class="btnrow">
+          <button class="btn" type="button" id="solveStep">Step ▸</button>
+          <button class="btn sec" type="button" id="solvePlay">Replay</button>
+          <button class="btn sec" type="button" id="solveReset">Reset</button>
+          <span class="fine" id="solveStepLabel">step 5 / 5</span>
+        </div>
+      </div>
+      <div>
+        <div class="fine">screen</div>
+        <div class="screen" id="solveScreen" style="margin-top:6px;min-height:82px">
+          <div class="tiles" id="solveTiles"></div>
+        </div>
+      </div>
+    </div>
+    <div class="chart" style="margin-top:14px;padding-bottom:4px" id="solveChart"></div>
+    <div class="chart-cap" id="solveCap">Under each position: the target letter, then the derived key. The final step rises to P, the total number of O keys.</div>
+    <div class="fine" id="solveStatus" role="status" style="margin-top:6px"></div>
+  </div>
+</section>
+<!-- 9 · WHOLE MAP -->
+<section class="slide" data-name="The whole map">
+  <div class="eyebrow">The whole map</div>
+  <h2>All 2<sup>N</sup> targets, all reachable</h2>
+  <p>Every target has exactly one preimage, so the typing map is a bijection. Pick a size and click any target to load it into the solver.</p>
+  <div class="row" style="align-items:center;gap:10px">
+    <span class="fine">size N</span>
+    <div class="seg" id="bijChooser"></div>
+    <span class="fine" id="bijNote"></span>
+  </div>
+  <div class="stats" id="bijStats" style="margin-top:12px"></div>
+  <div class="chips" id="bijChips" style="margin-top:14px"></div>
+  <p class="fine" style="margin-top:12px">Each chip reads target → keystrokes. Checked by exhaustive simulation for N = 1…12: 8,190 strings, every target hit exactly once.</p>
+</section>
+
+<!-- 10 · CODE -->
+<section class="slide" data-name="The code">
+  <div class="eyebrow">Your solution</div>
+  <h2>The same idea, scanned backwards</h2>
+  <p>The accepted solution keeps the parity of O keys already chosen to the right. At each position it undoes those flips, records the key, and if the key is O adds one flip for everything further left.</p>
+  <div class="grid2 code-grid" style="align-items:start">
+    <pre class="code" id="codeBox" aria-label="C++ solution"></pre>
+    <div class="card">
+      <div class="fine">walk through</div>
+      <div class="btnrow" style="flex-direction:column;align-items:stretch;margin-top:8px">
+        <button class="btn sec" type="button" data-hl="input">1 · read T and k once</button>
+        <button class="btn sec" type="button" data-hl="dir">2 · scan right to left</button>
+        <button class="btn sec" type="button" data-hl="undo">3 · undo the flips</button>
+        <button class="btn sec" type="button" data-hl="key">4 · record the key</button>
+        <button class="btn sec" type="button" data-hl="out">5 · print YES and the keys</button>
+        <button class="btn sec" type="button" data-hl="">clear</button>
+      </div>
+      <p class="fine" id="codeNote" style="margin:10px 0 0">Pick a step to highlight it in the code.</p>
+      <p class="fine" style="margin-top:10px;margin-bottom:0">Time O(N) per test · memory O(N) for the answer.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 11 · SUMMARY -->
+<section class="slide" data-name="Summary">
+  <div class="eyebrow">Summary</div>
+  <h2>Three moves, one answer</h2>
+  <div class="grid3">
+    <div class="card">
+      <h3>① Invert the flip</h3>
+      <p class="muted" style="margin:0">Only later O's touch a letter. The final letter is the typed letter XOR the parity of later O's.</p>
+    </div>
+    <div class="card">
+      <h3>② The staircase is forced</h3>
+      <p class="muted" style="margin:0">q<sub>j</sub> ≡ S<sub>1</sub> + S<sub>j</sub> (mod 2). The count rises exactly where the target changes letter.</p>
+    </div>
+    <div class="card">
+      <h3>③ Copy the last letter</h3>
+      <p class="muted" style="margin:0">The last key is S<sub>N</sub>. Every other key follows a boundary. Exactly one sequence works.</p>
+    </div>
+  </div>
+  <div class="card hl" style="margin-top:18px;text-align:center">
+    <div class="mono" style="font-size:clamp(1rem,2.2vw,1.35rem);line-height:1.9">
+      c<sub>j</sub> = O &nbsp;⇔&nbsp; S<sub>j</sub> ≠ S<sub>j+1</sub> &nbsp;&nbsp;·&nbsp;&nbsp; c<sub>N</sub> = S<sub>N</sub>
+    </div>
+    <p class="fine" style="margin:10px 0 0">always YES · unique keystrokes · O(N) per test</p>
+  </div>
+  <p class="muted" style="margin-top:22px">That is the whole problem: invert the simulation, count the O's, and copy the last letter.</p>
+</section>
+</main>
+<footer class="bot">
+  <span id="slideLabel">1 / 12</span>
+  <span class="dots" id="dots"></span>
+  <span class="hint">← → navigate · P autoplay</span>
+</footer>
+<div id="caption" role="status" aria-live="polite"></div>
+<script>
+"use strict";
+const $ = (sel, root) => (root || document).querySelector(sel);
+const $$ = (sel, root) => [...(root || document).querySelectorAll(sel)];
+const sleep = ms => window.__dry ? Promise.resolve() : new Promise(r => setTimeout(r, ms));
+if (new URLSearchParams(location.search).get("dry")) window.__dry = true;
+
+function tileHTML(ch, cls){
+  return `<span class="tile ${ch === "M" ? "m" : "o"} ${cls || ""}">${ch}</span>`;
+}
+function simulate(keys){
+  let s = "";
+  for (const k of keys){
+    if (k === "O") s = [...s].map(c => c === "M" ? "O" : "M").join("");
+    s += k;
+  }
+  return s;
+}
+
+/* ---------------- slide navigation ---------------- */
+const slides = $$(".slide");
+const names = slides.map(s => s.dataset.name || "");
+let cur = 0;
+const dotsEl = $("#dots");
+slides.forEach((_, i) => {
+  const d = document.createElement("span");
+  d.onclick = () => go(i);
+  dotsEl.appendChild(d);
+});
+$$(".tab").forEach(t => { t.onclick = () => go(+t.dataset.go); });
+const onEnter = {};
+function go(i){
+  cur = Math.max(0, Math.min(slides.length - 1, i));
+  slides.forEach((s, k) => s.classList.toggle("on", k === cur));
+  [...dotsEl.children].forEach((d, k) => d.classList.toggle("on", k === cur));
+  $$(".tab").forEach(t => {
+    const g = +t.dataset.go;
+    t.classList.toggle("on",
+      (g === 1 && cur >= 1 && cur < 3) ||
+      (g === 3 && cur >= 3 && cur < 8) ||
+      (g === 8 && cur >= 8 && cur < 10) ||
+      (g === 10 && cur >= 10));
+  });
+  $("#slideLabel").textContent = `${cur + 1} / ${slides.length} · ${names[cur]}`;
+  if (onEnter[cur]) onEnter[cur]();
+  $("main").scrollTop = 0;
+}
+document.addEventListener("keydown", e => {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+  if (e.key === "ArrowRight" || e.key === "PageDown"){ e.preventDefault(); go(cur + 1); }
+  if (e.key === "ArrowLeft" || e.key === "PageUp"){ e.preventDefault(); go(cur - 1); }
+  if (e.key === "p" || e.key === "P") autoplay();
+});
+
+/* ---------------- title demo ---------------- */
+let titleRun = 0;
+async function titleDemo(){
+  const run = ++titleRun;
+  const el = $("#titleTiles");
+  if (!el) return;
+  const status = $("#titleStatus");
+  let screen = "";
+  el.innerHTML = "";
+  status.textContent = "press O, M, O";
+  for (const k of "OMO"){
+    if (k === "O" && screen){
+      screen = [...screen].map(c => c === "M" ? "O" : "M").join("");
+      el.innerHTML = [...screen].map(c => tileHTML(c, "flip")).join("");
+      status.textContent = "O flips every earlier letter";
+      await sleep(280);
+      if (run !== titleRun) return;
+    }
+    screen += k;
+    el.innerHTML = [...screen].map((c, i) =>
+      tileHTML(c, i === screen.length - 1 ? "fresh" : "")).join("");
+    status.textContent = `keys ${"OMO".slice(0, screen.length)} — screen ${screen}`;
+    await sleep(560);
+    if (run !== titleRun) return;
+  }
+  status.textContent = "keys O M O → screen M O O";
+}
+
+/* ---------------- forward lab ---------------- */
+let labKeys = "";
+let labEpoch = 0;
+function labLog(){
+  const log = $("#labLog");
+  if (!labKeys){
+    log.innerHTML = 'keys <span class="fine">none yet</span>';
+    return;
+  }
+  log.innerHTML = "keys " + [...labKeys].map(k =>
+    `<span class="tile sm ${k === "M" ? "m" : "o"}">${k}</span>`).join("") +
+    ` <span class="fine">${labKeys.length} pressed</span>`;
+}
+function labRender(){
+  const screen = simulate(labKeys);
+  const tiles = $("#labTiles");
+  tiles.innerHTML = screen
+    ? [...screen].map((c, i) => tileHTML(c, i === screen.length - 1 ? "fresh" : "")).join("")
+    : '<span class="tile ghost">·</span>';
+  labLog();
+}
+async function labPress(k){
+  const run = ++labEpoch;
+  const tiles = $("#labTiles");
+  const status = $("#labStatus");
+  const before = simulate(labKeys);
+  if (k === "O" && before){
+    labKeys += "O";
+    const flipped = [...before].map(c => c === "M" ? "O" : "M").join("");
+    tiles.innerHTML = [...flipped].map(c => tileHTML(c, "flip")).join("");
+    status.textContent = `O flips ${before.length} letter${before.length === 1 ? "" : "s"}, then appends O`;
+    labLog();
+    await sleep(280);
+    if (run !== labEpoch) return;
+  } else {
+    labKeys += k;
+    status.textContent = k === "M" ? "M appends an M at the end" : "O appends an O";
+  }
+  labRender();
+}
+$$(".key[data-key]").forEach(b => { b.onclick = () => labPress(b.dataset.key); });
+$$("[data-preset]").forEach(b => {
+  b.onclick = async () => {
+    labKeys = "";
+    labEpoch++;
+    labRender();
+    for (const k of b.dataset.preset){
+      await labPress(k);
+      await sleep(420);
+    }
+  };
+});
+const labClear = $("[data-lab-clear]");
+if (labClear) labClear.onclick = () => {
+  labKeys = "";
+  labEpoch++;
+  labRender();
+  $("#labStatus").textContent = "";
+};
+
+/* ---------------- k = 0 / k = 1 ---------------- */
+function setK(k){
+  const out = $("#kOut");
+  if (out) out.textContent = k === 1 ? "YES\nMOOMO" : "YES";
+  $$("[data-k]").forEach(b => {
+    const on = +b.dataset.k === k;
+    b.classList.toggle("btn", on);
+    b.classList.toggle("sec", !on);
+  });
+  const note = $("#kNote");
+  if (note) note.textContent = k === 1
+    ? "With k = 1, print N characters after YES. Any valid sequence is accepted, and there is only one."
+    : "With k = 0, stop after the verdict: one line per test.";
+}
+$$("[data-k]").forEach(b => { b.onclick = () => setK(+b.dataset.k); });
+/* ---------------- growth table ---------------- */
+function buildGrow(){
+  const el = $("#growTable");
+  if (!el) return;
+  const rows = [
+    [10, "2^10 = 1,024", "instant"],
+    [20, "2^20 = 1,048,576", "about a second"],
+    [30, "2^30 = 1,073,741,824", "minutes to hours"],
+    [400000, "2^400000 ≈ 10^120412", "never"]
+  ];
+  el.innerHTML = `<thead><tr><th>N</th><th>keystroke strings</th><th>trying all of them</th></tr></thead><tbody>`
+    + rows.map(([n, s, v]) =>
+      `<tr><td class="num">${n.toLocaleString("en-US")}</td><td class="mono">${s}</td><td>${v}</td></tr>`
+    ).join("")
+    + `</tbody>`;
+}
+
+/* ---------------- the staircase chart ---------------- */
+function solveKeys(s){
+  let out = "";
+  for (let j = 0; j < s.length; j++){
+    if (j < s.length - 1) out += s[j] !== s[j + 1] ? "O" : "M";
+    else out += s[j];
+  }
+  return out;
+}
+function qSeries(s){
+  const n = s.length;
+  if (!n) return [0];
+  const q = [0];
+  for (let j = 1; j <= n - 1; j++) q.push(q[j - 1] + (s[j - 1] !== s[j] ? 1 : 0));
+  q.push(q[n - 1] + (s[n - 1] === "O" ? 1 : 0));
+  return q;
+}
+function chartGeom(s){
+  const n = s.length;
+  const q = qSeries(s);
+  const P = q[n];
+  const W = 720, H = 300;
+  const left = 46, right = 30, top = 32, bottom = 104;
+  const plotW = W - left - right;
+  const plotH = H - top - bottom;
+  const yMax = Math.max(P, 1);
+  const x = j => left + (n ? (j / n) * plotW : 0);
+  const y = v => top + plotH - (v / yMax) * plotH;
+  return { n, q, P, W, H, left, right, top, bottom, plotW, plotH, yMax, x, y };
+}
+function chartMarkup(s, g, cursor){
+  const { n, q, P, W, H, left, plotW, plotH, x, y } = g;
+  const baseY = g.top + plotH;
+  const showLetters = n <= 16;
+  const showQ = n <= 12 && P <= 10;
+  const showKeys = n <= 16;
+  const half = plotW / Math.max(n, 1) / 2;
+  const minWidth = n > 10 ? Math.max(620, n * 42) : 0;
+  const parts = [];
+  parts.push(`<svg viewBox="0 0 ${W} ${H}"${minWidth ? ` style="min-width:${minWidth}px"` : ""} role="img" aria-label="O-count staircase for the target ${s}. The count before each position is ${q.slice(0, n).join(", ")}, ending at ${P}.">`);
+  const vStep = Math.max(1, Math.ceil(P / 6));
+  const vLabels = [];
+  for (let v = 0; v <= P; v += vStep) vLabels.push(v);
+  if (vLabels[vLabels.length - 1] !== P){
+    if (P - vLabels[vLabels.length - 1] >= vStep * 0.6) vLabels.push(P);
+    else vLabels[vLabels.length - 1] = P;
+  }
+  for (const v of vLabels){
+    const yy = y(v);
+    parts.push(`<line class="chart-grid" x1="${left}" x2="${left + plotW}" y1="${yy}" y2="${yy}"></line>`);
+    parts.push(`<text class="chart-axis-label" x="${left - 12}" y="${yy + 4}" text-anchor="end">${v}</text>`);
+  }
+  parts.push(`<text class="chart-axis-title" x="${left}" y="${g.top - 12}">O's typed so far</text>`);
+  parts.push(`<text class="chart-axis-title" x="${left}" y="${H - 8}">position in the target</text>`);
+  if (cursor >= 0){
+    const xc = x(cursor);
+    const x0 = Math.max(left, xc - half);
+    const x1 = Math.min(left + plotW, xc + half);
+    parts.push(`<rect class="cursor-band" x="${x0}" y="${g.top}" width="${Math.max(0, x1 - x0)}" height="${plotH}"></rect>`);
+  }
+  let d = `M ${x(0)} ${y(q[0])}`;
+  for (let j = 0; j < n; j++){
+    d += ` H ${x(j + 1)}`;
+    if (q[j + 1] !== q[j]) d += ` V ${y(q[j + 1])}`;
+  }
+  parts.push(`<path class="chart-line" d="${d}"></path>`);
+  for (let j = 0; j <= n; j++){
+    parts.push(`<circle class="chart-dot" cx="${x(j)}" cy="${y(q[j])}" r="4.5"></circle>`);
+    if (showQ) parts.push(`<text class="chart-q-label" x="${x(j)}" y="${y(q[j]) - 10}" text-anchor="middle">${q[j]}</text>`);
+  }
+  if (showLetters){
+    for (let j = 0; j < n; j++){
+      const cx = (x(j) + x(j + 1)) / 2;
+      parts.push(`<text class="chart-target ${s[j] === "M" ? "target-m" : "target-o"}" x="${cx}" y="${baseY + 30}" text-anchor="middle">${s[j]}</text>`);
+      if (showKeys){
+        const key = j < n - 1 ? (s[j] !== s[j + 1] ? "O" : "M") : s[n - 1];
+        parts.push(`<text class="chart-key ${key === "O" ? "key-o" : "key-m"}" x="${cx}" y="${baseY + 52}" text-anchor="middle">${key}</text>`);
+      }
+    }
+  }
+  parts.push(`<text class="chart-p-label" x="${x(n)}" y="${baseY + 74}" text-anchor="end">P = ${P}</text>`);
+  if (cursor >= 0){
+    const xc = x(cursor);
+    parts.push(`<line class="cursor-line" x1="${xc}" x2="${xc}" y1="${g.top - 4}" y2="${baseY}"></line>`);
+    parts.push(`<circle class="cursor-dot" cx="${xc}" cy="${y(q[cursor])}" r="7"></circle>`);
+  }
+  parts.push("</svg>");
+  return parts.join("");
+}
+class StairChart {
+  constructor(root){
+    this.root = root;
+    this.geom = null;
+  }
+  render(s, cursor = -1){
+    if (!this.root) return;
+    this.geom = chartGeom(s);
+    this.root.innerHTML = chartMarkup(s, this.geom, cursor);
+  }
+}
+
+let stairTarget = "OOMOO";
+function stairCap(s){
+  const q = qSeries(s), P = q[s.length];
+  return `Target ${[...s].join(" ")}. Count of O's before positions 1…${s.length}: ${q.slice(0, s.length).join(", ")}. The last key raises the count to P = ${P}, matching the first letter's parity.`;
+}
+const stairChart = new StairChart($("#stairChart"));
+function renderStair(s){
+  stairTarget = s;
+  stairChart.render(s);
+  $("#stairCap").textContent = stairCap(s);
+  $$("#stairChooser button").forEach(b => b.classList.toggle("on", b.dataset.t === s));
+}
+$$("#stairChooser button").forEach(b => { b.onclick = () => renderStair(b.dataset.t); });
+/* ---------------- solver lab ---------------- */
+const solverChart = new StairChart($("#solveChart"));
+const solver = { target: "OOMOO", keys: "", step: 5 };
+let solverRun = 0;
+
+function solverRender(){
+  const { target, keys, step } = solver;
+  const n = target.length;
+  const typed = keys.slice(0, step);
+  const screen = simulate(typed);
+  $("#keyStrip").innerHTML = [...keys].map((k, i) =>
+    `<span class="tile sm ${k === "M" ? "m" : "o"}" style="${i >= step ? "opacity:.28" : ""}">${k}</span>`).join("");
+  $("#solveTiles").innerHTML = screen
+    ? [...screen].map(c => tileHTML(c)).join("")
+    : '<span class="fine">empty screen</span>';
+  $("#solveStepLabel").textContent = `step ${step} / ${n}`;
+  $("#solveStep").disabled = step >= n;
+  solverChart.render(target, step);
+  const complete = step >= n;
+  $("#solveStatus").textContent = step === 0
+    ? "Nothing typed yet. Press Step to type the first key."
+    : complete
+      ? `Simulation matches ${target}. The key sequence is unique.`
+      : `Typed ${step} of ${n} keys. Screen: ${screen}.`;
+}
+function solverSetTarget(s){
+  solverRun++;
+  solver.target = s;
+  solver.keys = solveKeys(s);
+  solver.step = s.length;
+  $("#targetIn").value = s;
+  $("#solveCap").textContent = `Target ${[...s].join(" ")}. Under each position: the target letter, then the derived key. The final step rises to P = ${qSeries(s)[s.length]}, the total number of O keys.`;
+  solverRender();
+}
+function sanitizeTarget(v){
+  return v.toUpperCase().replace(/[^MO]/g, "").slice(0, 16) || "M";
+}
+$("#targetApply").onclick = () => solverSetTarget(sanitizeTarget($("#targetIn").value));
+$("#targetIn").addEventListener("input", e => {
+  const el = e.target;
+  const v = el.value.toUpperCase().replace(/[^MO]/g, "").slice(0, 16);
+  if (v !== el.value){
+    const pos = Math.min(el.selectionStart || v.length, v.length);
+    el.value = v;
+    try { el.setSelectionRange(pos, pos); } catch (_) {}
+  }
+});
+$("#targetIn").addEventListener("keydown", e => {
+  if (e.key === "Enter"){ e.preventDefault(); $("#targetApply").click(); }
+});
+$("#solveStep").onclick = () => {
+  if (solver.step >= solver.target.length) return;
+  solverRun++;
+  solver.step++;
+  solverRender();
+};
+$("#solveReset").onclick = () => {
+  solverRun++;
+  solver.step = 0;
+  solverRender();
+};
+$("#solvePlay").onclick = async () => {
+  const run = ++solverRun;
+  solver.step = 0;
+  solverRender();
+  await sleep(240);
+  while (solver.step < solver.target.length){
+    if (run !== solverRun) return;
+    solver.step++;
+    solverRender();
+    await sleep(420);
+  }
+};
+
+/* ---------------- the whole map ---------------- */
+let bijN = 4;
+function glyphs(s){
+  return [...s].map(c => `<span class="${c === "M" ? "m" : "o"}">${c}</span>`).join("");
+}
+function renderBij(n){
+  bijN = n;
+  const total = 1 << n;
+  $("#bijStats").innerHTML =
+    `<div class="stat"><div class="n">${total}</div><div class="l">targets of length ${n}</div></div>` +
+    `<div class="stat"><div class="n">${total}</div><div class="l">reachable</div></div>` +
+    `<div class="stat zero"><div class="n">0</div><div class="l">unreachable</div></div>`;
+  $("#bijNote").textContent = `2^${n} targets · 2^${n} keystroke strings`;
+  const seg = $("#bijChooser");
+  seg.innerHTML = "";
+  for (let i = 1; i <= 6; i++){
+    const b = document.createElement("button");
+    b.type = "button";
+    b.textContent = i;
+    b.className = i === n ? "on" : "";
+    b.onclick = () => renderBij(i);
+    seg.appendChild(b);
+  }
+  const chips = [];
+  for (let mask = 0; mask < total; mask++){
+    let s = "";
+    for (let j = 0; j < n; j++) s += (mask >> (n - 1 - j)) & 1 ? "O" : "M";
+    chips.push(`<button class="chip" type="button" data-target="${s}">${glyphs(s)}<span class="k">↳ ${glyphs(solveKeys(s))}</span></button>`);
+  }
+  $("#bijChips").innerHTML = chips.join("");
+  $$("#bijChips .chip").forEach(c => {
+    c.onclick = () => { solverSetTarget(c.dataset.target); go(8); };
+  });
+}
+
+/* ---------------- the code ---------------- */
+const CODE = [
+  ["input", "#include <iostream>"],
+  ["input", "#include <cstring>"],
+  ["", "using namespace std;"],
+  ["input", "int main()"],
+  ["", "{"],
+  ["input", "    int n, k, t, flips;"],
+  ["input", "    string s;"],
+  ["input", "    char ans[400005];"],
+  ["input", "    cin >> t >> k;"],
+  ["", "    for(int i = 0;i < t;i++)"],
+  ["", "    {"],
+  ["", "        cin >> n;"],
+  ["", "        cin >> s;"],
+  ["", "        flips = 0;"],
+  ["dir", "        for(int j = n - 1;j >= 0;j--)"],
+  ["dir", "        {"],
+  ["undo", "            if(flips % 2 != 0)"],
+  ["undo", "            {"],
+  ["undo", "                if(s[j] == 'O')"],
+  ["undo", "                {"],
+  ["undo", "                    s[j] = 'M';"],
+  ["undo", "                }"],
+  ["undo", "                else"],
+  ["undo", "                {"],
+  ["undo", "                    s[j] = 'O';"],
+  ["undo", "                }"],
+  ["undo", "            }"],
+  ["key", "            if(s[j] == 'O')"],
+  ["key", "            {"],
+  ["key", "                flips++;"],
+  ["key", "            }"],
+  ["key", "            ans[j] = s[j];"],
+  ["", "        }"],
+  ["out", "        cout << \"YES\" << endl;"],
+  ["out", "        if(k == 1)"],
+  ["out", "        {"],
+  ["out", "            for(int j = 0;j < n;j++)"],
+  ["out", "            {"],
+  ["out", "                cout << ans[j];"],
+  ["out", "            }"],
+  ["out", "            cout << endl;"],
+  ["out", "        }"],
+  ["", "    }"],
+  ["", "    return 0;"],
+  ["", "}"]
+];
+const CODE_NOTES = {
+  "": "Pick a step to highlight it in the code.",
+  input: "T and k are read once, before any target. k decides whether keys are printed for every test.",
+  dir: "Scan right to left. Only O keys already chosen to the right can flip the current letter.",
+  undo: "If an odd number of later keys were O, undo one flip: M becomes O and O becomes M. What remains is the key that was typed.",
+  key: "If that key is O, every position further left gains one more flip. Record the key.",
+  out: "YES is unconditional. When k = 1, print the recorded keys left to right."
+};
+function escHTML(s){
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+function hiLite(line){
+  let h = escHTML(line);
+  h = h.replace(/(&quot;|")[^"&]*(&quot;|")/g, m => `<span class="tok-str">${m}</span>`);
+  h = h.replace(/('[^']*')/g, '<span class="tok-str">$1</span>');
+  h = h.replace(/\b(int|char|string|for|if|else|return|using|namespace|std|endl)\b/g, '<span class="tok-kw">$1</span>');
+  h = h.replace(/\b(\d+)\b/g, '<span class="tok-num">$1</span>');
+  h = h.replace(/(&lt;)(iostream|cstring)(&gt;)/g, '$1<span class="tok-str">$2</span>$3');
+  return h;
+}
+function renderCode(tag){
+  const box = $("#codeBox");
+  if (!box) return;
+  box.innerHTML = CODE.map(([t, line]) =>
+    `<span class="code-line${tag && t === tag ? " hl" : ""}">${hiLite(line)}</span>`).join("");
+  const note = $("#codeNote");
+  if (note) note.textContent = CODE_NOTES[tag] || CODE_NOTES[""];
+  $$("[data-hl]").forEach(b => {
+    const on = !!tag && b.dataset.hl === tag;
+    b.classList.toggle("btn", on);
+    b.classList.toggle("sec", !on);
+  });
+  if (tag){
+    const first = box.querySelector(".code-line.hl");
+    if (first){
+      const br = first.getBoundingClientRect(), pr = box.getBoundingClientRect();
+      if (br.top < pr.top || br.bottom > pr.bottom) box.scrollTop += br.top - pr.top - 36;
+    }
+  } else {
+    box.scrollTop = 0;
+  }
+}
+$$("[data-hl]").forEach(b => { b.onclick = () => renderCode(b.dataset.hl); });
+/* ---------------- autoplay narration ---------------- */
+const capEl = $("#caption");
+window.__capLog = [];
+async function say(html, ms){
+  const plain = html.replace(/<[^>]+>/g, "");
+  window.__capLog.push({ text: plain, t: +(performance.now() / 1000).toFixed(2) });
+  capEl.innerHTML = html;
+  capEl.classList.add("on");
+  const dur = window.__ttsDur && window.__ttsDur[plain];
+  await sleep(Math.max(ms || 0, dur ? dur * 1000 + 400 : 0));
+}
+async function typeInto(sel, text, speed){
+  const el = typeof sel === "string" ? $(sel) : sel;
+  if (!el) return;
+  el.value = "";
+  el.focus();
+  for (const ch of text){
+    el.value += ch;
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+    await sleep(speed || 80);
+  }
+  el.blur();
+}
+let autoplayOn = false;
+async function autoplay(){
+  if (autoplayOn) return;
+  autoplayOn = true;
+  document.body.classList.add("autoplay");
+  try {
+    go(0);
+    await say("USACO 2026 Second Contest, Bronze Problem 1: <b>It's Mooin' Time IV</b>.", 4200);
+    go(1);
+    await say("<b class='mono' style='color:var(--m)'>M</b> appends an M. <b class='mono' style='color:var(--o)'>O</b> first flips every letter already on screen, then appends an O.", 5400);
+    labKeys = ""; labEpoch++; labRender();
+    await sleep(500);
+    await labPress("O"); await sleep(750);
+    await labPress("M"); await sleep(750);
+    await labPress("O"); await sleep(1200);
+    await say("Keys <b class='mono'>O M O</b> leave <b class='mono' style='color:var(--m)'>M O O</b> on the screen.", 3600);
+    go(2);
+    await say("The input gives T and k, then T targets. The sum of all N is 4×10<sup>5</sup>. Always print YES; when k = 1, also print a valid N-letter key string.", 6600);
+    setK(1); await sleep(900);
+    setK(0); await sleep(700);
+    setK(1);
+    go(3);
+    await say("A brute force tries all 2<sup>N</sup> key strings. At N = 400,000 that is about 10<sup>120412</sup> strings — more than there are atoms in the observable universe.", 6600);
+    go(4);
+    await say("Fix one position. Its letter is flipped once by every O typed after it. O's before it never touch it, and its own key never flips it.", 6400);
+    go(5);
+    await say("Let P be the total number of O keys, and q<sub>j</sub> the number typed before position j. An O at j has P − q<sub>j</sub> later O's, and its own 1 cancels against that count.", 7200);
+    go(6);
+    await say("So the parity of q<sub>j</sub> is fixed: q<sub>j</sub> ≡ S<sub>1</sub> + S<sub>j</sub>. The count starts at zero and rises by one exactly where the target changes. The staircase is forced.", 7200);
+    await sleep(500);
+    renderStair("MOMOM"); await sleep(1400);
+    await say("Try another target and the same staircase appears: risers at every boundary, flats everywhere else.", 4400);
+    renderStair("OOMOO");
+    go(7);
+    await say("After the last position, P equals q<sub>N</sub> plus the last key. Only one key satisfies the parity: c<sub>N</sub> = S<sub>N</sub>. Every boundary gives a key, and the last letter is copied.", 7600);
+    go(8);
+    await typeInto("#targetIn", "OOMOO", 90);
+    await sleep(400);
+    solverSetTarget("OOMOO");
+    await say("Here is OOMOO. Boundaries at 2–3 and 3–4 become O; equal boundaries become M; the last O is copied. Keys: <b class='mono'>M O O M O</b>.", 6600);
+    solver.step = 0;
+    solverRender();
+    await sleep(500);
+    for (let i = 0; i < 5; i++){
+      solver.step++;
+      solverRender();
+      await sleep(540);
+    }
+    await say("Typing M O O M O returns the screen to OOMOO. The simulation matches, and the keys are unique.", 5000);
+    go(9);
+    await say("Every target of length N has exactly one preimage. The typing map is a bijection, so the answer is always YES.", 5600);
+    renderBij(4); await sleep(900);
+    go(10);
+    renderCode("input");
+    await say("The code reads T and k once.", 3000);
+    renderCode("dir");
+    await say("Then it scans each target from right to left with one counter: the parity of O keys already chosen to the right.", 5200);
+    renderCode("undo");
+    await say("At each position it undoes those flips. What remains is the key that was typed.", 4600);
+    renderCode("key");
+    await say("If that key is O, the counter increments for everything further left, and the key is recorded.", 5200);
+    renderCode("out");
+    await say("YES is unconditional. When k = 1 the recorded keys are printed in order. Linear time per test.", 5200);
+    renderCode("");
+    go(11);
+    await say("Invert the flip. Force the staircase. Copy the last letter. Always YES, unique keys, O(N) per test.", 6200);
+    capEl.classList.remove("on");
+  } catch (err){
+    console.error(err);
+  } finally {
+    autoplayOn = false;
+    document.body.classList.remove("autoplay");
+    window.__autoplayDone = true;
+  }
+}
+
+/* ---------------- init ---------------- */
+buildGrow();
+renderCode("");
+setK(1);
+renderBij(4);
+solverSetTarget("OOMOO");
+renderStair("OOMOO");
+labKeys = "OMO";
+labRender();
+$("#labStatus").textContent = "sample · keys O M O leave M O O";
+
+onEnter[0] = titleDemo;
+onEnter[6] = () => renderStair(stairTarget);
+onEnter[9] = () => renderBij(bijN);
+onEnter[10] = () => renderCode("");
+
+const qs = new URLSearchParams(location.search);
+const startAt = qs.get("s");
+go(startAt !== null ? +startAt : 0);
+if (qs.get("autoplay")) setTimeout(autoplay, 700);
+</script>
+</body>
+</html>
