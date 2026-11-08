@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>USACO 2025 · Reflection</title>
+<style>
+  :root{
+    --bg:#0f172a; --panel:#1e293b; --panel2:#273449; --text:#e2e8f0; --muted:#94a3b8;
+    --acc:#38bdf8; --odd:#f59e0b; --even:#22c55e; --red:#f87171; --pur:#a78bfa;
+    --cell-on:#e2e8f0;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
+    font-family:"Segoe UI",system-ui,sans-serif;font-size:20px}
+  body{display:flex;flex-direction:column;
+       padding-left:max(16px, env(safe-area-inset-left, 0px));
+       padding-right:max(16px, env(safe-area-inset-right, 0px))}
+  header,footer{flex:none}
+  header{display:flex;align-items:center;gap:16px;padding:12px 28px;background:#0b1222;border-bottom:1px solid #334155;flex-wrap:wrap}
+  header h1{font-size:20px;margin:0;font-weight:600;color:var(--acc)}
+  .tabs{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}
+  .tab{padding:6px 14px;border-radius:8px;background:var(--panel);color:var(--muted);cursor:pointer;font-size:16px;border:1px solid transparent;white-space:nowrap}
+  .tab.on{color:var(--text);border-color:var(--acc)}
+  main{flex:1;min-height:0;overflow:auto}
+  .slide{display:none;max-width:1200px;margin:0 auto;padding:28px 36px;animation:fade .4s}
+  .slide.on{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1}}
+  h2{font-size:36px;margin:0 0 6px;text-wrap:balance}
+  h2 small{font-size:18px;color:var(--muted);font-weight:400;margin-left:10px}
+  h3{color:var(--acc);margin:18px 0 8px}
+  p,li{line-height:1.5}
+  .muted{color:var(--muted)}
+  .big{font-size:30px}
+  .kicker{font-family:Consolas,monospace;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:40px 0 10px}
+  .mega{font-size:58px;line-height:1.02;margin:0 0 10px}
+  .center{text-align:center}
+  .row{display:flex;gap:20px;flex-wrap:wrap}
+  .card{background:var(--panel);border-radius:14px;padding:18px 22px;flex:1;min-width:280px}
+  .card.hl{border:2px solid var(--acc)}
+  .card.flat{background:transparent;border:1px solid #334155}
+  .mono,code{font-family:Consolas,"Cascadia Code",monospace}
+  code{background:#0b1222;border:1px solid #334155;border-radius:5px;padding:1px 5px;font-size:.88em}
+  .digits{display:inline-flex;gap:4px;font-family:Consolas,monospace;font-size:30px}
+  .gridwrap{display:inline-block;max-width:100%;padding:14px;background:#0b1222;border:1px solid #334155;border-radius:12px;overflow-x:auto}
+  .cgrid{
+    display:inline-grid;gap:3px;
+    grid-template-columns:repeat(var(--n, 8), var(--cell, 32px));
+    grid-auto-rows:var(--cell, 32px);
+  }
+  .cell{
+    appearance:none;display:block;padding:0;border:1px solid #475569;border-radius:3px;
+    background:var(--panel2);cursor:default;
+    transition:background .18s ease, border-color .18s ease, box-shadow .18s ease;
+  }
+  button.cell{cursor:pointer}
+  button.cell:hover{border-color:var(--acc)}
+  .cell.ink{background:var(--cell-on);border-color:var(--cell-on)}
+  .cell.orb{outline:2px solid var(--odd);outline-offset:1px;position:relative;z-index:1}
+  .cell.pulse{animation:cellpulse 1.1s ease 2}
+  @keyframes cellpulse{
+    0%,100%{outline:2px solid var(--odd);outline-offset:1px}
+    50%{outline:3px solid var(--odd);outline-offset:4px}
+  }
+  .arrow{font-size:26px;color:var(--muted);margin:0 8px}
+  button{background:var(--acc);color:#0b1222;border:none;border-radius:8px;padding:8px 16px;font-size:17px;font-weight:600;cursor:pointer;margin:4px 4px 4px 0;font-family:inherit}
+  button.sec{background:var(--panel2);color:var(--text)}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  input[type=range]{accent-color:var(--acc)}
+  table{border-collapse:collapse;font-size:18px}
+  td,th{padding:6px 12px;border-bottom:1px solid #334155;text-align:left}
+  th{color:var(--muted);font-weight:500}
+  tr:last-child td{border-bottom:0}
+  .badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:14px;font-weight:600}
+  .b-par{background:var(--pur);color:#111}
+  .b-min{background:var(--acc);color:#111}
+  .b-1{background:var(--odd);color:#111}
+  .b-2{background:var(--even);color:#111}
+  .formula{font-size:32px;text-align:center;padding:16px;background:#0b1222;border:1px solid #334155;border-radius:12px;margin:16px 0}
+  .formula b{color:var(--acc)}
+  .formula.small{font-size:17px;padding:11px 14px;font-family:Consolas,monospace}
+  .formula.flash{background:#1e3a5f;border-color:var(--acc)}
+  .statrow{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:baseline;margin:12px 0 4px}
+  .stat{display:flex;align-items:baseline;gap:8px;font-family:Consolas,monospace;font-size:14px;color:var(--muted)}
+  .stat b{font-size:24px;color:var(--text);line-height:1}
+  .stat.cost b{color:var(--odd)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  .chip{display:inline-flex;align-items:center;gap:6px;font-family:Consolas,monospace;font-size:13px;padding:3px 8px;border:1px solid #334155;border-radius:5px;background:#0b1222;color:var(--muted)}
+  .chip i{width:9px;height:9px;border-radius:2px;border:1px solid #475569;background:var(--panel2);display:inline-block}
+  .chip.on i{background:var(--cell-on);border-color:var(--cell-on)}
+  .mini{display:inline-grid;grid-template-columns:repeat(4,16px);grid-auto-rows:16px;gap:2px;vertical-align:middle}
+  .mini i{border:1px solid #475569;border-radius:2px;background:var(--panel2)}
+  .mini i.ink{background:var(--cell-on);border-color:var(--cell-on)}
+  .costtable td.cost{color:var(--odd);font-size:22px;font-weight:600}
+  .costtable tr.flash td{background:#3b2f12}
+  .costtable td.num,.costtable th.num{text-align:right}
+  .contrib td.n{text-align:right}
+  .contrib td.c{color:var(--odd);text-align:right;font-weight:600}
+  .contrib tr.sel td{background:#1e3a5f}
+  .outstrip{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;min-height:30px}
+  .outchip{font-family:Consolas,monospace;font-size:14px;padding:3px 9px;border-radius:5px;background:#0b1222;border:1px solid #334155;color:var(--muted)}
+  .outchip.last{border-color:var(--acc);color:var(--acc)}
+  .big-num{font-family:Consolas,monospace;font-size:34px;color:var(--acc);line-height:1.1}
+  .big-num span{display:block;font-family:"Segoe UI",system-ui,sans-serif;font-size:15px;color:var(--muted);margin-top:4px}
+  .steps{list-style:none;counter-reset:step;padding:0;margin:0;display:grid;gap:12px}
+  .steps li{counter-increment:step;position:relative;padding-left:38px;color:var(--text)}
+  .steps li::before{content:counter(step);position:absolute;left:0;top:2px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;border:1px solid var(--acc);border-radius:50%;font-family:Consolas,monospace;font-size:13px;color:var(--acc)}
+  .steps li b{color:var(--acc)}
+  pre.code{margin:0;background:#0b1222;border-radius:12px;padding:16px 20px;font-size:13px;line-height:1.4;overflow:auto;max-height:calc(100vh - 260px);font-family:Consolas,"Cascadia Code",monospace}
+  pre.code::-webkit-scrollbar{width:8px;height:8px}
+  .kw{color:#c084fc}.ty{color:#38bdf8}.cm{color:#64748b;font-style:italic}.nu{color:#fbbf24}.st{color:#86efac}
+  .hlLine{background:#1e3a5f;display:inline-block;width:100%}
+  footer{height:48px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 24px;background:#0b1222;border-top:1px solid #334155;font-size:15px;color:var(--muted)}
+  .dots span{display:inline-block;width:10px;height:10px;border-radius:50%;background:#334155;margin:0 3px;cursor:pointer}
+  .dots span.on{background:var(--acc)}
+  #caption{position:fixed;left:50%;bottom:66px;transform:translateX(-50%);max-width:min(1300px, calc(100vw - 32px));width:max-content;
+    background:rgba(2,6,23,.92);border:1px solid #334155;border-radius:12px;padding:12px 24px;font-size:23px;
+    line-height:1.4;text-align:center;opacity:0;transition:opacity .4s;pointer-events:none;z-index:10}
+  #caption.on{opacity:1}
+  body.autoplay{cursor:none}
+  body.autoplay #caption{bottom:62px}
+  a{color:var(--acc)}
+  @media (max-width: 760px){
+    html,body{font-size:17px}
+    header{padding:10px 16px}
+    header h1{font-size:16px}
+    .tab{font-size:13px;padding:5px 10px}
+    .slide{padding:20px 12px}
+    h2{font-size:26px}
+    h2 small{display:block;margin:4px 0 0}
+    .mega{font-size:42px}
+    .row{flex-direction:column;gap:14px}
+    .card{min-width:0;padding:14px 16px}
+    .formula{font-size:22px}
+    footer{padding:0 12px;font-size:12px}
+    .dots{display:none}
+    #caption{font-size:17px;padding:10px 14px;bottom:58px}
+    pre.code{max-height:none;font-size:12px}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{transition-duration:.01ms !important;animation-duration:.01ms !important}
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>USACO · 2025 February Bronze · “Reflection”</h1>
+  <div class="tabs">
+    <div class="tab" data-go="1">① The Problem</div>
+    <div class="tab" data-go="3">② The Insight</div>
+    <div class="tab" data-go="9">③ The Code</div>
+  </div>
+</header>
+<main>
+<!-- 0 TITLE -->
+<section class="slide center">
+  <p class="kicker">USACO 2025 February · Bronze · Problem 1</p>
+  <h2 class="mega">Reflection,<br>four ways</h2>
+  <p class="muted big">A visual walkthrough</p>
+  <div class="gridwrap" style="margin-top:22px">
+    <div class="cgrid" id="titleGrid" style="--n:8; --cell:26px"></div>
+  </div>
+  <p class="muted" style="margin-top:22px;font-size:16px">Use ← / → (or the dots below) to move between slides · P = autoplay</p>
+</section>
+
+<!-- 1 THE RULE -->
+<section class="slide">
+  <h2>The canvas is four copies <small>one quadrant, reflected</small></h2>
+  <div class="row">
+    <div class="card">
+      <p>FJ paints the <b>top-right quadrant</b> of an even <code>N × N</code> canvas, then reflects it across the vertical and horizontal center lines.</p>
+      <p>A canvas is <b>valid</b> when that reflection reproduces the whole grid exactly. Every cell and its three mirror images hold the same value.</p>
+      <p>Each update flips one cell. After every update, output the <b>minimum number of flips</b> needed to make the canvas valid.</p>
+      <p>
+        <span class="badge b-1">N ≤ 2000</span>
+        <span class="badge b-2">U ≤ 2·10⁵</span>
+        <span class="badge b-par">N is even</span>
+      </p>
+    </div>
+    <div class="card" style="flex:1.1;text-align:center">
+      <div class="gridwrap">
+        <div class="cgrid" id="heroGrid" style="--n:8; --cell:clamp(24px, 4vw, 36px)"></div>
+      </div>
+      <div><button id="heroReflectBtn" onclick="heroReflect()">Reflect the painting</button></div>
+      <p class="muted" id="heroNote" style="font-size:16px;margin:4px 0 0">Top-right quadrant painted.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 2 THE TWINS -->
+<section class="slide">
+  <h2>Pick a cell, meet its twins <small>four cells, one value</small></h2>
+  <div class="row">
+    <div class="card" style="flex:1.1;text-align:center">
+      <div class="gridwrap">
+        <div class="cgrid" id="mirrorGrid" style="--n:8; --cell:clamp(24px, 4vw, 36px)"></div>
+      </div>
+      <p class="muted" style="font-size:16px;margin:6px 0 0">Click any cell to ring its orbit.</p>
+    </div>
+    <div class="card">
+      <p>Reflect <code>(r, c)</code> and three partners come with it:</p>
+      <div class="formula small">(r, c) · (r, N−1−c)<br>(N−1−r, c) · (N−1−r, N−1−c)</div>
+      <p>Because <code>N</code> is even, no cell is its own twin. The canvas splits into exactly <code>N²/4</code> groups of four: 16 groups at <code>N = 8</code>, and one million at <code>N = 2000</code>.</p>
+      <div class="statrow">
+        <span class="stat">orbit <b id="mirrorKey">—</b></span>
+        <span class="stat">painted k <b id="mirrorK">0</b></span>
+        <span class="stat cost">cost <b id="mirrorCost">0</b></span>
+      </div>
+      <div class="chips" id="mirrorChips"></div>
+      <p class="muted" id="mirrorNote" style="font-size:16px;margin:8px 0 0">Any of the four cells gives the same orbit.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 3 ORBITS -->
+<section class="slide">
+  <h2>Orbits never talk <small>independent decisions</small></h2>
+  <div class="row">
+    <div class="card" style="flex:1.15">
+      <div class="gridwrap" style="display:block;text-align:center">
+        <div class="cgrid" id="orbitGrid" style="--n:8; --cell:clamp(22px, 3.6vw, 34px)"></div>
+      </div>
+      <div class="statrow">
+        <span class="stat">orbit <b id="orbitKey">—</b></span>
+        <span class="stat">painted k <b id="orbitK">0</b></span>
+        <span class="stat cost">cost <b id="orbitCost">0</b></span>
+        <span class="stat">total <b id="orbitTotal">0</b></span>
+      </div>
+      <div class="chips" id="orbitChips"></div>
+      <div style="margin-top:12px">
+        <button onclick="orbitRepair()">Repair this orbit</button>
+        <button class="sec" onclick="orbitReset()">Reset</button>
+      </div>
+      <p class="muted" style="font-size:15px;margin:6px 0 0" id="orbitNote">Click a cell to flip it; the yellow ring marks its orbit.</p>
+    </div>
+    <div class="card">
+      <p>Call each group of four an <b>orbit</b>. Reflections map every orbit onto itself, never onto a different one.</p>
+      <p>That makes the orbits independent. Deciding that one orbit ends up all painted cannot force any choice in another orbit.</p>
+      <p>So the cheapest valid canvas is the <b>sum of each orbit's cheapest repair</b>, taken separately. There is no trade to make between them.</p>
+      <div class="card hl" style="margin-top:14px;padding:12px 16px">
+        An orbit never needs information from another orbit, so minimizing each one separately gives the global minimum.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4 COST -->
+<section class="slide">
+  <h2>Two ways to fix one orbit <small>take the cheaper</small></h2>
+  <div class="row">
+    <div class="card" style="flex:1.05">
+      <table class="costtable" style="width:100%">
+        <thead>
+          <tr><th>k painted</th><th>orbit</th><th class="num">paint 4−k</th><th class="num">erase k</th><th class="num">cost</th></tr>
+        </thead>
+        <tbody id="costBody"></tbody>
+      </table>
+      <p class="muted" style="font-size:15px;margin:8px 0 0">A light square is one painted cell.</p>
+    </div>
+    <div class="card">
+      <p>An orbit with <code>k</code> painted cells has <code>4 − k</code> blank cells. A valid canvas needs all four equal, and there are only two ways to get there.</p>
+      <p><b>Paint the blanks:</b> <code>4 − k</code> flips, ending all <code>#</code>.<br>
+         <b>Erase the paint:</b> <code>k</code> flips, ending all <code>.</code></p>
+      <div class="formula" id="costFormula">cost(k) = min(k, <b>4 − k</b>)</div>
+      <p>Its values are <code>0, 1, 2, 1, 0</code>. An orbit never costs more than 2, because one of the two choices is always available for at most half the cells.</p>
+      <p>With <code>N²/4</code> orbits, the answer never exceeds <code>N²/2</code> — 2,000,000 at the largest <code>N</code>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 5 SAMPLE -->
+<section class="slide">
+  <h2>The sample <small>four orbits, four costs</small></h2>
+  <div class="row">
+    <div class="card" style="flex:1.05;text-align:center">
+      <div class="gridwrap">
+        <div class="cgrid" id="sampleGrid" style="--n:4; --cell:clamp(44px, 8vw, 62px)"></div>
+      </div>
+      <p class="muted" style="font-size:15px;margin:8px 0 0" id="sampleNote">Sample output: 4, 3, 2, 1, 0, 1.</p>
+      <div style="margin-top:8px">
+        <button id="sampleReplayBtn" onclick="sampleReplay()">Replay the five updates</button>
+        <button class="sec" onclick="sampleReset()">Reset</button>
+      </div>
+    </div>
+    <div class="card">
+      <table class="contrib" style="width:100%">
+        <thead>
+          <tr><th>orbit</th><th class="n">k</th><th class="c">cost</th><th class="n">running</th></tr>
+        </thead>
+        <tbody id="sampleBody"></tbody>
+      </table>
+      <div class="outstrip" id="sampleOut" aria-label="Sample output so far"></div>
+      <p style="margin:10px 0 0">The sample canvas has four orbits. Counting painted cells gives <code>k = 1, 2, 4, 3</code>, so the costs are <code>1, 2, 0, 1</code> and the answer is <b>4</b>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 6 UPDATES -->
+<section class="slide">
+  <h2>One toggle, one orbit <small>constant-time update</small></h2>
+  <div class="row">
+    <div class="card" style="flex:1.05">
+      <div class="row" style="gap:12px;align-items:center;justify-content:center">
+        <div style="text-align:center">
+          <div class="mono" style="font-size:12px;color:var(--muted)">before · k = 2</div>
+          <span class="mini" style="grid-template-columns:repeat(2,26px);grid-auto-rows:26px">
+            <i class="ink"></i><i></i><i></i><i class="ink"></i>
+          </span>
+          <div class="mono" style="font-size:12px;color:var(--odd)">cost 2</div>
+        </div>
+        <span class="arrow">→</span>
+        <div style="text-align:center">
+          <div class="mono" style="font-size:12px;color:var(--muted)">flip one cell</div>
+          <span class="mini" style="grid-template-columns:repeat(2,26px);grid-auto-rows:26px">
+            <i class="ink"></i><i class="ink"></i><i></i><i class="ink"></i>
+          </span>
+          <div class="mono" style="font-size:12px;color:var(--muted)">k = 3</div>
+        </div>
+        <span class="arrow">→</span>
+        <div style="text-align:center">
+          <div class="mono" style="font-size:12px;color:var(--muted)">after · k = 3</div>
+          <span class="mini" style="grid-template-columns:repeat(2,26px);grid-auto-rows:26px">
+            <i class="ink"></i><i class="ink"></i><i></i><i class="ink"></i>
+          </span>
+          <div class="mono" style="font-size:12px;color:var(--odd)">cost 1</div>
+        </div>
+      </div>
+      <div class="formula small" style="margin-top:18px">answer −= cost(2) · answer += cost(1)</div>
+      <p class="muted" style="font-size:15px;margin:0">The four cells are drawn as they sit around the center: two above, two below.</p>
+    </div>
+    <div class="card">
+      <p>An update flips a single cell, and that cell belongs to exactly one orbit. Only that orbit's count <code>k</code> changes.</p>
+      <p>Remove its old cost, apply the flip, add the new cost:</p>
+      <div class="formula small">answer += cost(k′) − cost(k)</div>
+      <p>Recounting the whole canvas after every update would cost <code>O(N²)</code> per update. Looking at one orbit instead makes each update constant time.</p>
+      <div class="row" style="gap:12px;margin-top:12px">
+        <div class="card flat" style="min-width:0;padding:10px 14px"><span class="muted" style="font-size:13px">time</span><div class="mono" style="color:var(--acc)">O(N² + U)</div></div>
+        <div class="card flat" style="min-width:0;padding:10px 14px"><span class="muted" style="font-size:13px">memory</span><div class="mono" style="color:var(--acc)">O(N²)</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- 7 FORMULA -->
+<section class="slide">
+  <h2>Putting it together</h2>
+  <div class="formula">answer = <b>Σ min(k, 4 − k)</b> &nbsp;over all N²/4 orbits</div>
+  <div class="row">
+    <div class="card">
+      <h3>① Count</h3>
+      <p>For every painted cell, find its canonical orbit
+      <code>(min(r, N−1−r), min(c, N−1−c))</code> and increment that count.</p>
+    </div>
+    <div class="card">
+      <h3>② Sum</h3>
+      <p>Add <code>min(k, 4−k)</code> over all <code>N²/4</code> orbit counts. That is the answer before any updates.</p>
+    </div>
+    <div class="card">
+      <h3>③ Update</h3>
+      <p>Subtract the old cost, flip the cell, adjust the count, add the new cost. One orbit per update.</p>
+    </div>
+  </div>
+  <div class="formula small">answer += cost(k′) − cost(k)</div>
+  <p class="muted" style="font-size:16px;margin:0">The canonical index works from any of the four cells, so one array of size <code>h × h</code>, where <code>h = N/2</code>, is enough.</p>
+</section>
+
+<!-- 8 LIMITS -->
+<section class="slide">
+  <h2>At the limits <small>N = 2000 · U = 200,000</small></h2>
+  <div class="row">
+    <div class="card big-num">4,000,000<span>cells to count</span></div>
+    <div class="card big-num">1,000,000<span>orbits in the canvas</span></div>
+    <div class="card big-num">200,000<span>updates to apply</span></div>
+  </div>
+  <div class="row" style="margin-top:18px">
+    <div class="card hl">
+      <h3 style="margin-top:0">The budget</h3>
+      <p><code>O(N² + U)</code> is about 4.2 million steps. Recounting after every update would be <code>O(N² · U)</code>, about 8·10¹¹ cell visits — far too slow.</p>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">The fit</h3>
+      <p>The answer is at most <code>N²/2 = 2,000,000</code>, so a 32-bit integer is enough. The grid and the orbit counts both fit easily in memory.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 9 CODE -->
+<section class="slide">
+  <h2>The C++ solution <small>O(N² + U)</small></h2>
+  <div class="row">
+    <div style="flex:2.4;min-width:min(520px, 100%)">
+      <pre class="code" id="codeBox"></pre>
+    </div>
+    <div class="card" style="flex:1">
+      <h3 style="margin-top:0">Walk through</h3>
+      <button class="sec" onclick="hlCode('count')">1 · count each orbit</button><br>
+      <button class="sec" onclick="hlCode('cost')">2 · the cost lambda</button><br>
+      <button class="sec" onclick="hlCode('answer')">3 · sum the costs</button><br>
+      <button class="sec" onclick="hlCode('update')">4 · apply one update</button><br>
+      <button class="sec" onclick="hlCode('')">clear</button>
+      <p class="muted" style="font-size:15px;margin-top:12px">Time: O(N² + U) · Memory: O(N²)</p>
+      <p class="muted" style="font-size:15px">The cost lambda is the only place the problem's rule appears; everything else is bookkeeping.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 10 SUMMARY -->
+<section class="slide">
+  <h2>Summary</h2>
+  <div class="row">
+    <div class="card"><h3 style="margin-top:0">① Four cells, one value</h3>Reflections pair every cell with three twins. A valid canvas gives each orbit one value.</div>
+    <div class="card"><h3 style="margin-top:0">② Take the cheaper fix</h3>An orbit with <code>k</code> painted cells costs <code>min(k, 4−k)</code>, never more than 2.</div>
+    <div class="card"><h3 style="margin-top:0">③ Repair one orbit</h3>Each update touches one orbit, so subtract the old cost and add the new one.</div>
+  </div>
+  <div class="formula" style="margin-top:22px">answer = <b>Σ min(k, 4 − k)</b> &nbsp;·&nbsp; update in <b>O(1)</b></div>
+  <p class="muted" style="font-size:15px;margin:0">More in this series:
+    <a href="2026%20Bronze%202nd%20contest%201st%20problem.html">It's Mooin' Time IV</a> ·
+    <a href="2026%20Bronze%203rd%20contest%202nd%20problem.html">Turn x into 0</a>
+  </p>
+</section>
+</main>
+<footer>
+  <span id="slideLabel"></span>
+  <span class="dots" id="dots"></span>
+  <span>← → to navigate · P = autoplay</span>
+</footer>
+<div id="caption"></div>
+<script>
+'use strict';
+
+const $ = (id) => document.getElementById(id);
+const cost = (k) => Math.min(k, 4 - k);
+const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+function orbitOf(r, c, n) {
+  return [[r, c], [r, n - 1 - c], [n - 1 - r, c], [n - 1 - r, n - 1 - c]];
+}
+function canonical(r, c, n) {
+  return [Math.min(r, n - 1 - r), Math.min(c, n - 1 - c)];
+}
+/* Map a cell back into the painted top-right quadrant. The column index is
+   measured outward from the vertical center line, so the left half mirrors. */
+function paintingCell(r, c, n) {
+  const h = n / 2;
+  return [r < h ? r : n - 1 - r, c < h ? h - 1 - c : c - h];
+}
+
+function buildGrid(host, n, interactive, onCell) {
+  host.replaceChildren();
+  host.style.setProperty('--n', n);
+  const cells = [];
+  for (let r = 0; r < n; r++) {
+    cells[r] = [];
+    for (let c = 0; c < n; c++) {
+      const el = document.createElement(interactive ? 'button' : 'span');
+      el.className = 'cell';
+      if (interactive) {
+        el.type = 'button';
+        el.setAttribute('aria-label', 'row ' + (r + 1) + ', column ' + (c + 1));
+        el.addEventListener('click', () => onCell(r, c));
+      } else {
+        el.setAttribute('aria-hidden', 'true');
+      }
+      host.appendChild(el);
+      cells[r][c] = el;
+    }
+  }
+  return cells;
+}
+
+/* ---------- slide navigation ---------- */
+const slides = [...document.querySelectorAll('.slide')];
+const names = ['Title', 'The canvas', 'The twins', 'Orbits', 'The cost',
+               'The sample', 'Updates', 'Putting it together', 'At the limits',
+               'The code', 'Summary'];
+const onEnter = {};
+let cur = 0;
+
+const dots = $('dots');
+slides.forEach((_, i) => {
+  const d = document.createElement('span');
+  d.addEventListener('click', () => go(i));
+  dots.appendChild(d);
+});
+document.querySelectorAll('.tab').forEach((t) => {
+  t.addEventListener('click', () => go(+t.dataset.go));
+});
+
+function go(i) {
+  cur = Math.max(0, Math.min(slides.length - 1, i));
+  slides.forEach((s, k) => s.classList.toggle('on', k === cur));
+  [...dots.children].forEach((d, k) => d.classList.toggle('on', k === cur));
+  document.querySelectorAll('.tab').forEach((t) => {
+    const g = +t.dataset.go;
+    t.classList.toggle('on',
+      (g === 1 && cur >= 1 && cur < 3) ||
+      (g === 3 && cur >= 3 && cur < 9) ||
+      (g === 9 && cur >= 9));
+  });
+  $('slideLabel').textContent = (cur + 1) + '/' + slides.length + ' · ' + names[cur];
+  if (onEnter[cur]) onEnter[cur]();
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT' && e.target.type === 'text') return;
+  if (e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); go(cur + 1); }
+  if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(cur - 1); }
+  if (e.key === 'p' || e.key === 'P') autoplay();
+});
+
+/* ---------- title ---------- */
+(function () {
+  const N = 8;
+  const piece = ['.#..', '.#..', '.##.', '....'];
+  const cells = buildGrid($('titleGrid'), N, false);
+  let timer = null;
+
+  function draw(reflected) {
+    for (let r = 0; r < N; r++) {
+      for (let c = 0; c < N; c++) {
+        let on;
+        if (reflected) {
+          const [rr, cc] = paintingCell(r, c, N);
+          on = piece[rr][cc] === '#';
+        } else {
+          on = r < 4 && c >= 4 && piece[r][c - 4] === '#';
+        }
+        cells[r][c].classList.toggle('ink', on);
+      }
+    }
+  }
+
+  function loop() {
+    if (cur !== 0) return;
+    draw(false);
+    timer = setTimeout(function () {
+      if (cur !== 0) return;
+      draw(true);
+      timer = setTimeout(function () {
+        if (cur !== 0) return;
+        loop();
+      }, 2400);
+    }, 1300);
+  }
+
+  onEnter[0] = function () {
+    clearTimeout(timer);
+    loop();
+  };
+})();
+
+/* ---------- slide 1: reflect the painting ---------- */
+(function () {
+  const N = 8;
+  const piece = ['.#..', '.#..', '.##.', '....'];
+  const cells = buildGrid($('heroGrid'), N, false);
+  let shown = false;
+
+  function draw(reflected) {
+    for (let r = 0; r < N; r++) {
+      for (let c = 0; c < N; c++) {
+        const [rr, cc] = paintingCell(r, c, N);
+        const on = reflected ? piece[rr][cc] === '#' : (r < 4 && c >= 4 && piece[r][c - 4] === '#');
+        cells[r][c].classList.toggle('ink', on);
+      }
+    }
+  }
+
+  window.heroShow = function (value) {
+    shown = value;
+    draw(shown);
+    $('heroNote').textContent = shown
+      ? 'Reflected across both axes: four copies, one painting.'
+      : 'Top-right quadrant painted.';
+    $('heroReflectBtn').textContent = shown ? 'Reset the canvas' : 'Reflect the painting';
+  };
+
+  window.heroReflect = function () { window.heroShow(!shown); };
+
+  draw(false);
+})();
+
+/* ---------- slide 2: cell and its twins ---------- */
+(function () {
+  const N = 8;
+  const piece = ['.#..', '.#..', '####', '.#..'];
+  let sel = [1, 2];
+
+  function value(r, c) {
+    const [rr, cc] = canonical(r, c, N);
+    return piece[rr][cc] === '#';
+  }
+
+  const cells = buildGrid($('mirrorGrid'), N, true, (r, c) => select(r, c));
+  for (let r = 0; r < N; r++) {
+    for (let c = 0; c < N; c++) cells[r][c].classList.toggle('ink', value(r, c));
+  }
+
+  function select(r, c) {
+    sel = canonical(r, c, N);
+    const orb = orbitOf(sel[0], sel[1], N);
+    const set = new Set(orb.map((p) => p[0] + ',' + p[1]));
+    let k = 0;
+    for (let rr = 0; rr < N; rr++) {
+      for (let cc = 0; cc < N; cc++) {
+        cells[rr][cc].classList.toggle('orb', set.has(rr + ',' + cc));
+      }
+    }
+    orb.forEach((p) => { if (value(p[0], p[1])) k++; });
+
+    $('mirrorKey').textContent = '(' + (sel[0] + 1) + ', ' + (sel[1] + 1) + ')';
+    $('mirrorK').textContent = k;
+    $('mirrorCost').textContent = cost(k);
+
+    const chips = $('mirrorChips');
+    chips.replaceChildren();
+    orb.forEach((p) => {
+      const chip = document.createElement('span');
+      chip.className = 'chip' + (value(p[0], p[1]) ? ' on' : '');
+      const box = document.createElement('i');
+      chip.appendChild(box);
+      chip.appendChild(document.createTextNode('(' + (p[0] + 1) + ', ' + (p[1] + 1) + ')'));
+      chips.appendChild(chip);
+    });
+
+    $('mirrorNote').textContent = (k === 0 || k === 4)
+      ? 'All four already agree, so this orbit costs 0.'
+      : 'Paint ' + (4 - k) + ' or erase ' + k + '; the cheaper is ' + cost(k) + '.';
+  }
+
+  window.mirrorSelect = select;
+  select(1, 1);
+})();
+
+/* ---------- slide 3: orbit lens ---------- */
+(function () {
+  const N = 8;
+  const H = 4;
+  let grid = [];
+  let sel = { r: 1, c: 2 };
+
+  const cells = buildGrid($('orbitGrid'), N, true, function (r, c) {
+    grid[r][c] = grid[r][c] === '#' ? '.' : '#';
+    sel = { r: r, c: c };
+    render();
+  });
+
+  function seed() {
+    grid = Array.from({ length: N }, () => Array(N).fill('.'));
+    for (let r = 0; r < H; r++) {
+      for (let c = 0; c < H; c++) {
+        const k = (r * 3 + c * 5) % 4;
+        const orb = orbitOf(r, c, N);
+        for (let i = 0; i < k; i++) grid[orb[i][0]][orb[i][1]] = '#';
+      }
+    }
+  }
+
+  function currentOrbit() {
+    const [kr, kc] = canonical(sel.r, sel.c, N);
+    return { kr: kr, kc: kc, orb: orbitOf(kr, kc, N) };
+  }
+
+  function render() {
+    const s = currentOrbit();
+    const set = new Set(s.orb.map((p) => p[0] + ',' + p[1]));
+    let k = 0;
+    for (let r = 0; r < N; r++) {
+      for (let c = 0; c < N; c++) {
+        cells[r][c].classList.toggle('ink', grid[r][c] === '#');
+        cells[r][c].classList.toggle('orb', set.has(r + ',' + c));
+      }
+    }
+    s.orb.forEach((p) => { if (grid[p[0]][p[1]] === '#') k++; });
+
+    $('orbitKey').textContent = '(' + (s.kr + 1) + ', ' + (s.kc + 1) + ')';
+    $('orbitK').textContent = k;
+    $('orbitCost').textContent = cost(k);
+
+    const chips = $('orbitChips');
+    chips.replaceChildren();
+    s.orb.forEach((p) => {
+      const chip = document.createElement('span');
+      chip.className = 'chip' + (grid[p[0]][p[1]] === '#' ? ' on' : '');
+      const box = document.createElement('i');
+      chip.appendChild(box);
+      chip.appendChild(document.createTextNode('(' + (p[0] + 1) + ', ' + (p[1] + 1) + ')'));
+      chips.appendChild(chip);
+    });
+
+    let total = 0;
+    for (let r = 0; r < H; r++) {
+      for (let c = 0; c < H; c++) {
+        let kk = 0;
+        orbitOf(r, c, N).forEach((p) => { if (grid[p[0]][p[1]] === '#') kk++; });
+        total += cost(kk);
+      }
+    }
+    $('orbitTotal').textContent = total;
+    $('orbitNote').textContent = (k === 0 || k === 4)
+      ? 'All four already agree; the orbit costs 0.'
+      : 'Paint ' + (4 - k) + ' or erase ' + k + '; take the cheaper.';
+  }
+
+  function repair() {
+    const s = currentOrbit();
+    let k = 0;
+    s.orb.forEach((p) => { if (grid[p[0]][p[1]] === '#') k++; });
+    const target = k >= 2 ? '#' : '.';
+    s.orb.forEach((p) => { grid[p[0]][p[1]] = target; });
+    render();
+  }
+
+  function reset() {
+    seed();
+    sel = { r: 1, c: 2 };
+    render();
+  }
+
+  async function demo() {
+    seed();
+    sel = { r: 1, c: 2 };
+    const orb = orbitOf(1, 2, N);
+    orb.forEach((p, i) => { grid[p[0]][p[1]] = i < 2 ? '#' : '.'; });
+    render();
+    await sleep(1500);
+    repair();
+  }
+
+  window.orbitRepair = repair;
+  window.orbitReset = reset;
+  window.orbitDemo = demo;
+
+  reset();
+})();
+/* ---------- slide 4: cost table ---------- */
+(function () {
+  const body = $('costBody');
+  for (let k = 0; k <= 4; k++) {
+    const tr = document.createElement('tr');
+    tr.dataset.k = k;
+
+    const tdK = document.createElement('td');
+    tdK.className = 'mono';
+    tdK.textContent = k;
+    tr.appendChild(tdK);
+
+    const tdMini = document.createElement('td');
+    const mini = document.createElement('span');
+    mini.className = 'mini';
+    for (let i = 0; i < 4; i++) {
+      const sq = document.createElement('i');
+      if (i < k) sq.className = 'ink';
+      mini.appendChild(sq);
+    }
+    tdMini.appendChild(mini);
+    tr.appendChild(tdMini);
+
+    const tdPaint = document.createElement('td');
+    tdPaint.className = 'num mono';
+    tdPaint.textContent = 4 - k;
+    tr.appendChild(tdPaint);
+
+    const tdErase = document.createElement('td');
+    tdErase.className = 'num mono';
+    tdErase.textContent = k;
+    tr.appendChild(tdErase);
+
+    const tdCost = document.createElement('td');
+    tdCost.className = 'num cost mono';
+    tdCost.textContent = cost(k);
+    tr.appendChild(tdCost);
+
+    body.appendChild(tr);
+  }
+})();
+
+let costFlashTimer = null;
+function flashCost(k) {
+  const rows = [...document.querySelectorAll('#costBody tr')];
+  rows.forEach((tr) => tr.classList.toggle('flash', +tr.dataset.k === k));
+  const f = $('costFormula');
+  f.classList.add('flash');
+  clearTimeout(costFlashTimer);
+  costFlashTimer = setTimeout(function () {
+    rows.forEach((tr) => tr.classList.remove('flash'));
+    f.classList.remove('flash');
+  }, 1900);
+}
+window.flashCost = flashCost;
+
+/* ---------- slide 5: sample explorer ---------- */
+(function () {
+  const N = 4;
+  const START = ['..#.', '##.#', '####', '..##'];
+  const UPDATES = [[0, 2], [1, 2], [3, 2], [3, 3], [3, 3]];
+  const ORDERS = [[0, 0], [0, 1], [1, 0], [1, 1]];
+
+  let grid = [];
+  let sel = { r: 0, c: 0 };
+  let out = [];
+  let timers = [];
+  let run = 0;
+  let replaying = false;
+
+  const cells = buildGrid($('sampleGrid'), N, true, function (r, c) {
+    stop();
+    grid[r][c] = grid[r][c] === '#' ? '.' : '#';
+    sel = { r: r, c: c };
+    out = [];
+    $('sampleNote').textContent = 'Manual edits. Reset returns to the sample.';
+    render();
+  });
+
+  function total() {
+    let t = 0;
+    ORDERS.forEach((order) => {
+      let k = 0;
+      orbitOf(order[0], order[1], N).forEach((p) => { if (grid[p[0]][p[1]] === '#') k++; });
+      t += cost(k);
+    });
+    return t;
+  }
+
+  function stop() {
+    run++;
+    timers.forEach(clearTimeout);
+    timers = [];
+    replaying = false;
+    const btn = $('sampleReplayBtn');
+    if (btn) { btn.disabled = false; btn.textContent = 'Replay the five updates'; }
+  }
+
+  function render() {
+    const c0 = canonical(sel.r, sel.c, N);
+    const set = new Set(orbitOf(c0[0], c0[1], N).map((p) => p[0] + ',' + p[1]));
+    for (let r = 0; r < N; r++) {
+      for (let c = 0; c < N; c++) {
+        cells[r][c].classList.toggle('ink', grid[r][c] === '#');
+        cells[r][c].classList.toggle('orb', set.has(r + ',' + c));
+      }
+    }
+
+    const body = $('sampleBody');
+    body.replaceChildren();
+    let running = 0;
+    ORDERS.forEach((order) => {
+      let k = 0;
+      orbitOf(order[0], order[1], N).forEach((p) => { if (grid[p[0]][p[1]] === '#') k++; });
+      const cst = cost(k);
+      running += cst;
+      const tr = document.createElement('tr');
+      if (order[0] === c0[0] && order[1] === c0[1]) tr.className = 'sel';
+      const tdOrbit = document.createElement('td');
+      tdOrbit.className = 'mono';
+      tdOrbit.textContent = '(' + (order[0] + 1) + ', ' + (order[1] + 1) + ')';
+      const tdK = document.createElement('td');
+      tdK.className = 'n mono';
+      tdK.textContent = k;
+      const tdCost = document.createElement('td');
+      tdCost.className = 'c mono';
+      tdCost.textContent = cst;
+      const tdRun = document.createElement('td');
+      tdRun.className = 'n mono';
+      tdRun.textContent = running;
+      tr.appendChild(tdOrbit);
+      tr.appendChild(tdK);
+      tr.appendChild(tdCost);
+      tr.appendChild(tdRun);
+      body.appendChild(tr);
+    });
+
+    const strip = $('sampleOut');
+    strip.replaceChildren();
+    out.forEach((value, i) => {
+      const chip = document.createElement('span');
+      chip.className = 'outchip' + (i === out.length - 1 ? ' last' : '');
+      chip.textContent = value;
+      strip.appendChild(chip);
+    });
+  }
+
+  function reset() {
+    stop();
+    grid = START.map((row) => row.split(''));
+    sel = { r: 0, c: 0 };
+    out = [total()];
+    $('sampleNote').textContent = 'Sample output: 4, 3, 2, 1, 0, 1.';
+    render();
+  }
+
+  function replay() {
+    reset();
+    const my = run;
+    replaying = true;
+    const btn = $('sampleReplayBtn');
+    btn.disabled = true;
+    btn.textContent = 'Replaying…';
+    $('sampleNote').textContent = 'Replaying the five updates from the statement.';
+    UPDATES.forEach((update, i) => {
+      timers.push(setTimeout(function () {
+        if (my !== run) return;
+        grid[update[0]][update[1]] = grid[update[0]][update[1]] === '#' ? '.' : '#';
+        sel = { r: update[0], c: update[1] };
+        out.push(total());
+        render();
+        if (i === UPDATES.length - 1) {
+          replaying = false;
+          btn.disabled = false;
+          btn.textContent = 'Replay the five updates';
+          $('sampleNote').textContent = 'Done. The answer went 4, 3, 2, 1, 0, 1.';
+        }
+      }, 700 * (i + 1)));
+    });
+  }
+
+  window.sampleReplay = replay;
+  window.sampleReset = reset;
+
+  reset();
+})();
+
+/* ---------- slide 9: code ---------- */
+const CODE = [
+  ['', '#include <bits/stdc++.h>'],
+  ['', 'using namespace std;'],
+  ['', 'int main() {'],
+  ['', '    ios::sync_with_stdio(false); cin.tie(nullptr);'],
+  ['', '    int n, u; cin >> n >> u;'],
+  ['', '    vector<string> grid(n);'],
+  ['', '    for (string &row : grid) cin >> row;'],
+  ['count', '    int h = n / 2;'],
+  ['count', '    vector<vector<int>> cnt(h, vector<int>(h, 0));'],
+  ['count', '    for (int r = 0; r < n; r++)'],
+  ['count', '        for (int c = 0; c < n; c++)'],
+  ['count', "            if (grid[r][c] == '#') {"],
+  ['count', '                int rr = min(r, n - 1 - r);'],
+  ['count', '                int cc = min(c, n - 1 - c);'],
+  ['count', '                cnt[rr][cc]++;'],
+  ['count', '            }'],
+  ['cost', '    auto cost = [](int k) { return min(k, 4 - k); };'],
+  ['answer', '    long long answer = 0;'],
+  ['answer', '    for (int r = 0; r < h; r++)'],
+  ['answer', '        for (int c = 0; c < h; c++)'],
+  ['answer', '            answer += cost(cnt[r][c]);'],
+  ['answer', "    cout << answer << '\\n';"],
+  ['update', '    while (u--) {'],
+  ['update', '        int r, c; cin >> r >> c; --r; --c;'],
+  ['update', '        int rr = min(r, n - 1 - r);'],
+  ['update', '        int cc = min(c, n - 1 - c);'],
+  ['update', '        answer -= cost(cnt[rr][cc]);'],
+  ['update', "        if (grid[r][c] == '#') {"],
+  ['update', "            grid[r][c] = '.'; cnt[rr][cc]--;"],
+  ['update', '        } else {'],
+  ['update', "            grid[r][c] = '#'; cnt[rr][cc]++;"],
+  ['update', '        }'],
+  ['update', '        answer += cost(cnt[rr][cc]);'],
+  ['update', "        cout << answer << '\\n';"],
+  ['update', '    }'],
+  ['', '    return 0;'],
+  ['', '}']
+];
+
+function esc(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function hiLite(line) {
+  let code = line;
+  let cm = '';
+  const k = line.indexOf('//');
+  if (k >= 0) { code = line.slice(0, k); cm = line.slice(k); }
+  let h = esc(code)
+    .replace(/('(?:\\.|[^'\\])*')/g, '<span class="st">$1</span>')
+    .replace(/\b(int|long|vector|string|auto|for|while|if|else|return|const|bool|char|void|using|namespace)\b/g, '<span class="ty">$1</span>')
+    .replace(/\b(min|max)\b/g, '<span class="kw">$1</span>')
+    .replace(/(#include)/, '<span class="kw">$1</span>')
+    .replace(/\b(\d+)\b/g, '<span class="nu">$1</span>');
+  return h + (cm ? '<span class="cm">' + esc(cm) + '</span>' : '');
+}
+
+function hlCode(tag) {
+  $('codeBox').innerHTML = CODE.map(function (entry) {
+    const t = entry[0];
+    const line = entry[1];
+    return tag && t === tag
+      ? '<span class="hlLine">' + (hiLite(line) || ' ') + '</span>'
+      : hiLite(line);
+  }).join('\n');
+}
+window.hlCode = hlCode;
+
+/* ---------- enter hooks ---------- */
+onEnter[2] = function () { window.mirrorSelect(1, 1); };
+onEnter[5] = function () { window.sampleReset(); };
+onEnter[9] = function () { hlCode(''); };
+
+/* ---------- autoplay ---------- */
+const capEl = $('caption');
+let autoplaying = false;
+
+async function say(text, ms) {
+  capEl.classList.remove('on');
+  await sleep(220);
+  capEl.innerHTML = text;
+  capEl.classList.add('on');
+  await sleep(ms);
+}
+
+async function autoplay() {
+  if (autoplaying) return;
+  autoplaying = true;
+  document.body.classList.add('autoplay');
+
+  go(0);
+  await say('Reflection · USACO 2025 February, Bronze Problem 1.', 3200);
+
+  go(1);
+  await say('N is even. FJ paints the top-right quadrant, then reflects it across both center lines.', 5200);
+  await say('A canvas is valid when that reflection reproduces it exactly: four copies, one painting.', 5200);
+  window.heroShow(true);
+  await sleep(1900);
+  await say('Each update flips one cell. After every update, print the fewest flips needed to make the canvas valid.', 6200);
+
+  go(2);
+  await say('Pick any cell. Reflections give it three twins: across the vertical axis, across the horizontal axis, and diagonally.', 6800);
+  window.mirrorSelect(1, 1);
+  await sleep(2400);
+  await say('In a valid canvas all four cells are equal. N is even, so no cell is its own twin.', 5600);
+
+  go(3);
+  await say('These groups are orbits. Reflections map every orbit onto itself, so orbits never interact.', 5600);
+  window.orbitDemo();
+  await sleep(2600);
+  await say('The cheapest repair is the sum of each orbit\'s cheapest repair, taken separately.', 5400);
+
+  go(4);
+  await say('An orbit with k painted cells has only two fixes: paint the 4 minus k blanks, or erase the k painted cells.', 6600);
+  flashCost(1);
+  await sleep(1200);
+  flashCost(3);
+  await sleep(1800);
+  await say('Take the smaller: cost is min of k and 4 minus k. Its values are 0, 1, 2, 1, 0.', 5600);
+  await say('So one orbit never costs more than 2, and the answer is at most N squared over 2.', 5000);
+
+  go(5);
+  await say('The sample has four orbits, with k equal to 1, 2, 4, and 3.', 4600);
+  await say('Their costs are 1, 2, 0, 1. The answer is 4.', 4200);
+  window.sampleReplay();
+  await sleep(700 * 6 + 500);
+  await say('The five updates give 3, 2, 1, 0, 1.', 4200);
+
+  go(6);
+  await say('An update flips one cell, so it touches exactly one orbit. Subtract the old cost and add the new one.', 6600);
+  await say('Recounting the whole grid each time would be quadratic per update. This delta is constant time.', 5600);
+
+  go(7);
+  await say('So the answer is the sum of min of k and 4 minus k, over all N squared over 4 orbits.', 5400);
+  await say('Each update changes one term: one subtraction, one flip, one addition.', 4800);
+
+  go(8);
+  await say('At N equal to 2000 there are four million cells and one million orbits.', 5000);
+  await say('Counting costs O of N squared. Every update costs O of 1. The total is O of N squared plus U.', 5600);
+
+  go(9);
+  await say('The code: count painted cells by the canonical orbit index.', 4600);
+  hlCode('count');
+  await sleep(3000);
+  await say('Sum the per-orbit cost. The cost lambda is the only place the rule appears.', 4800);
+  hlCode('cost');
+  await sleep(2600);
+  await say('Each update removes the old cost, flips the cell, adjusts the count, and adds the new cost.', 5800);
+  hlCode('update');
+  await sleep(3400);
+  hlCode('');
+
+  go(10);
+  await say('Four cells, one decision. Count, take the cheaper fix, and repair one orbit at a time.', 5800);
+
+  capEl.classList.remove('on');
+  await sleep(700);
+  document.body.classList.remove('autoplay');
+  autoplaying = false;
+  window.__autoplayDone = true;
+}
+window.autoplay = autoplay;
+
+/* ---------- start ---------- */
+const params = new URLSearchParams(location.search);
+go(+params.get('s') || 0);
+if (params.get('autoplay')) setTimeout(autoplay, 800);
+</script>
+</body>
+</html>
